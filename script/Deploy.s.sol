@@ -112,50 +112,43 @@ contract Deploy is Script {
         );
 
         // Define constants
-        string memory name = "Bannyverse";
-        string memory symbol = "BANNY";
+        string memory name = "Bananapus";
+        string memory symbol = "$NANA";
         string memory projectUri = "";
         string memory baseUri = "ipfs://";
         string memory contractUri = "";
         uint32 nativeCurrency = uint32(uint160(JBConstants.NATIVE_TOKEN));
         uint8 decimals = 18;
         uint256 decimalMultiplier = 10 ** decimals;
-        uint24 nakedBannyCategory = 0;
         uint40 oneDay = 86_400;
-        uint40 start = uint40(block.timestamp); // 15 minutes from now
+        uint40 start = uint40(block.timestamp);
 
-        // The terminals that the project will accept funds through.
-        JBTerminalConfig[] memory terminalConfigurations = new JBTerminalConfig[](1);
+        // The tokens that the project accepts.
         address[] memory tokensToAccept = new address[](1);
 
         // Accept the chain's native currency through the multi terminal.
         tokensToAccept[0] = JBConstants.NATIVE_TOKEN;
+
+        // The terminals that the project will accept funds through.
+        JBTerminalConfig[] memory terminalConfigurations = new JBTerminalConfig[](1);
         terminalConfigurations[0] =
             JBTerminalConfig({terminal: IJBTerminal(multiTerminalAddress), tokensToAccept: tokensToAccept});
 
         // The project's revnet stage configurations.
-        REVStageConfig[] memory stageConfigurations = new REVStageConfig[](2);
+        REVStageConfig[] memory stageConfigurations = new REVStageConfig[](1);
         stageConfigurations[0] = REVStageConfig({
             startsAtOrAfter: start,
-            operatorSplitRate: uint16(JBConstants.MAX_RESERVED_RATE / 2),
-            initialIssuanceRate: uint112(1_000_000 * decimalMultiplier),
-            priceCeilingIncreaseFrequency: oneDay,
-            priceCeilingIncreasePercentage: uint32(JBConstants.MAX_DECAY_RATE / 20), // 5%
-            priceFloorTaxIntensity: uint16(JBConstants.MAX_REDEMPTION_RATE / 5) // 0.2
-        });
-        stageConfigurations[1] = REVStageConfig({
-            startsAtOrAfter: start + 86_400 * 28,
-            operatorSplitRate: uint16(JBConstants.MAX_RESERVED_RATE / 2),
-            initialIssuanceRate: uint112(100_000 * decimalMultiplier),
+            operatorSplitRate: uint16(JBConstants.MAX_RESERVED_RATE / 5),
+            initialIssuanceRate: uint112(1_000 * decimalMultiplier),
             priceCeilingIncreaseFrequency: 7 * oneDay,
-            priceCeilingIncreasePercentage: uint16(JBConstants.MAX_DECAY_RATE / 100), // 1%
-            priceFloorTaxIntensity: uint16(JBConstants.MAX_REDEMPTION_RATE / 2) // 0.5
+            priceCeilingIncreasePercentage: uint32(JBConstants.MAX_DECAY_RATE / 100), // 1%
+            priceFloorTaxIntensity: uint16(JBConstants.MAX_REDEMPTION_RATE / 3) // 0.3
         });
 
         // The project's revnet configuration
         REVConfig memory revnetConfiguration = REVConfig({
             baseCurrency: nativeCurrency,
-            premintTokenAmount: 80_000_000 * decimalMultiplier,
+            premintTokenAmount: 37_000_000 * decimalMultiplier,
             initialOperator: operator,
             stageConfigurations: stageConfigurations
         });
@@ -173,91 +166,31 @@ contract Deploy is Script {
             poolConfigurations: buybackPoolConfigurations
         });
 
-        // The project's NFT tiers.
-        JB721TierConfig[] memory tiers = new JB721TierConfig[](4);
-
-        tiers[0] = JB721TierConfig({
-            price: uint104(1 * (decimalMultiplier - 4)),
-            initialSupply: 999_999_999, // MAX
-            votingUnits: 0,
-            reserveFrequency: 0,
-            reserveBeneficiary: address(0),
-            encodedIPFSUri: bytes32(""),
-            category: nakedBannyCategory,
-            allowOwnerMint: false,
-            useReserveBeneficiaryAsDefault: false,
-            transfersPausable: false,
-            useVotingUnits: false,
-            cannotBeRemoved: true
-        });
-        tiers[1] = JB721TierConfig({
-            price: uint104(1 * (decimalMultiplier - 2)),
-            initialSupply: 10_000,
-            votingUnits: 0,
-            reserveFrequency: 0,
-            reserveBeneficiary: address(0),
-            encodedIPFSUri: bytes32(""),
-            category: nakedBannyCategory,
-            allowOwnerMint: false,
-            useReserveBeneficiaryAsDefault: false,
-            transfersPausable: false,
-            useVotingUnits: false,
-            cannotBeRemoved: true
-        });
-        tiers[2] = JB721TierConfig({
-            price: uint104(1 * (decimalMultiplier - 1)),
-            initialSupply: 1000,
-            votingUnits: 0,
-            reserveFrequency: 0,
-            reserveBeneficiary: address(0),
-            encodedIPFSUri: bytes32(""),
-            category: nakedBannyCategory,
-            allowOwnerMint: false,
-            useReserveBeneficiaryAsDefault: false,
-            transfersPausable: false,
-            useVotingUnits: false,
-            cannotBeRemoved: true
-        });
-        tiers[3] = JB721TierConfig({
-            price: uint104(1 * decimalMultiplier),
-            initialSupply: 100,
-            votingUnits: 0,
-            reserveFrequency: 0,
-            reserveBeneficiary: address(0),
-            encodedIPFSUri: bytes32(""),
-            category: nakedBannyCategory,
-            allowOwnerMint: false,
-            useReserveBeneficiaryAsDefault: false,
-            transfersPausable: false,
-            useVotingUnits: false,
-            cannotBeRemoved: true
-        });
-
         // The project's allowed croptop posts.
         REVCroptopAllowedPost[] memory allowedPosts = new REVCroptopAllowedPost[](4);
         allowedPosts[0] = REVCroptopAllowedPost({
-            category: 100,
+            category: 0,
             minimumPrice: 10 ** (decimals - 3),
             minimumTotalSupply: 10_000,
             maximumTotalSupply: 999_999_999,
             allowedAddresses: new address[](0)
         });
         allowedPosts[1] = REVCroptopAllowedPost({
-            category: 101,
+            category: 1,
             minimumPrice: 10 ** (decimals - 1),
             minimumTotalSupply: 100,
             maximumTotalSupply: 999_999_999,
             allowedAddresses: new address[](0)
         });
         allowedPosts[2] = REVCroptopAllowedPost({
-            category: 102,
+            category: 2,
             minimumPrice: 10 ** decimals,
             minimumTotalSupply: 10,
             maximumTotalSupply: 999_999_999,
             allowedAddresses: new address[](0)
         });
         allowedPosts[3] = REVCroptopAllowedPost({
-            category: 103,
+            category: 3,
             minimumPrice: 10 ** (decimals + 2),
             minimumTotalSupply: 10,
             maximumTotalSupply: 999_999_999,
@@ -283,13 +216,11 @@ contract Deploy is Script {
         // Specify all sucker deployments.
         REVSuckerDeploymentConfig memory suckerDeploymentConfiguration =
             REVSuckerDeploymentConfig({deployerConfigurations: suckerDeployerConfigurations, salt: suckerSalt});
+
         // Deploy it all.
         vm.startBroadcast();
 
-        // Deploy the Banny URI Resolver.
-        Banny721TokenUriResolver resolver = new Banny721TokenUriResolver(msg.sender, trustedForwarder);
-
-        // Deploy the $BANNY Revnet.
+        // Deploy the $NANA Revnet.
         REVCroptopDeployer(revCroptopDeployerAddress).deployCroptopRevnetWith({
             description: REVDescription(name, symbol, projectUri, tokenSalt),
             configuration: revnetConfiguration,
@@ -302,10 +233,10 @@ contract Deploy is Script {
                     symbol: symbol,
                     rulesets: IJBRulesets(rulesetsAddress),
                     baseUri: baseUri,
-                    tokenUriResolver: IJB721TokenUriResolver(address(resolver)),
+                    tokenUriResolver: IJB721TokenUriResolver(address(0)),
                     contractUri: contractUri,
                     tiersConfig: JB721InitTiersConfig({
-                        tiers: tiers,
+                        tiers: new JB721TierConfig[](0),
                         currency: nativeCurrency,
                         decimals: decimals,
                         prices: IJBPrices(address(0))

@@ -1,4 +1,4 @@
-# Bannyverse
+# Bananapus project deployer
 
 ## Install
 
