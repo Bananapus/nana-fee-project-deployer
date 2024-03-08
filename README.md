@@ -1,4 +1,6 @@
-# Bananapus project deployer
+# Bananapus fee project deployer
+
+Deploys the $NANA project as project ID 1, which will take ecosystem fees.
 
 ## Install
 
