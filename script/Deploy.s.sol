@@ -134,7 +134,7 @@ contract Deploy is Script {
         stageConfigurations[0] = REVStageConfig({
             startsAtOrAfter: start,
             operatorSplitRate: uint16(JBConstants.MAX_RESERVED_RATE / 5),
-            initialIssuanceRate: uint112(1_000 * decimalMultiplier),
+            initialIssuanceRate: uint112(1000 * decimalMultiplier),
             priceCeilingIncreaseFrequency: 7 * oneDay,
             priceCeilingIncreasePercentage: uint32(JBConstants.MAX_DECAY_RATE / 100), // 1%
             priceFloorTaxIntensity: uint16(JBConstants.MAX_REDEMPTION_RATE / 3) // 0.3
