@@ -30,8 +30,6 @@ import {REVCroptopAllowedPost} from "@rev-net/core/src/structs/REVCroptopAllowed
 import {REVCroptopDeployer} from "@rev-net/core/src/REVCroptopDeployer.sol";
 import {REVSuckerDeploymentConfig} from "@rev-net/core/src/structs/REVSuckerDeploymentConfig.sol";
 
-import {Banny721TokenUriResolver} from "./../src/Banny721TokenUriResolver.sol";
-
 contract Deploy is Script {
     function run() public {
         // We need some pseudo-random bytes32.
