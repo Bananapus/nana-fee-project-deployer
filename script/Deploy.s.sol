@@ -10,8 +10,6 @@ import {IJBTerminal} from "@bananapus/core/src/interfaces/terminal/IJBTerminal.s
 import {IJBRulesets} from "@bananapus/core/src/interfaces/IJBRulesets.sol";
 import {IJBPrices} from "@bananapus/core/src/interfaces/IJBPrices.sol";
 import {IJBBuybackHook} from "@bananapus/buyback-hook/src/interfaces/IJBBuybackHook.sol";
-import {IJB721TiersHook} from "@bananapus/721-hook/src/interfaces/IJB721TiersHook.sol";
-import {IJB721TiersHookDeployer} from "@bananapus/721-hook/src/interfaces/IJB721TiersHookDeployer.sol";
 import {IJB721TiersHookStore} from "@bananapus/721-hook/src/interfaces/IJB721TiersHookStore.sol";
 import {IJB721TokenUriResolver} from "@bananapus/721-hook/src/interfaces/IJB721TokenUriResolver.sol";
 import {JB721TierConfig} from "@bananapus/721-hook/src/structs/JB721TierConfig.sol";
@@ -31,7 +29,6 @@ import {REVConfig} from "@rev-net/core/src/structs/REVConfig.sol";
 import {REVCroptopAllowedPost} from "@rev-net/core/src/structs/REVCroptopAllowedPost.sol";
 import {REVCroptopDeployer} from "@rev-net/core/src/REVCroptopDeployer.sol";
 import {REVSuckerDeploymentConfig} from "@rev-net/core/src/structs/REVSuckerDeploymentConfig.sol";
-import {CTAllowedPost} from "@croptop/core/src/structs/CTAllowedPost.sol";
 
 import {Banny721TokenUriResolver} from "./../src/Banny721TokenUriResolver.sol";
 

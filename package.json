@@ -4,7 +4,7 @@
     "license": "MIT",
     "repository": {
       "type": "git",
-      "url": "git+https://github.com/mejango/banny-core"
+      "url": "git+https://github.com/bananapus/nana-fee-project-id"
     },
     "scripts": {
       "test": "forge test",
