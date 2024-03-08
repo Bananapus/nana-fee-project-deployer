@@ -162,30 +162,37 @@ contract Deploy is Script {
         });
 
         // The project's allowed croptop posts.
-        REVCroptopAllowedPost[] memory allowedPosts = new REVCroptopAllowedPost[](4);
+        REVCroptopAllowedPost[] memory allowedPosts = new REVCroptopAllowedPost[](5);
         allowedPosts[0] = REVCroptopAllowedPost({
             category: 0,
-            minimumPrice: 10 ** (decimals - 3),
-            minimumTotalSupply: 10_000,
+            minimumPrice: 10 ** (decimals - 4),
+            minimumTotalSupply: 100_000,
             maximumTotalSupply: 999_999_999,
             allowedAddresses: new address[](0)
         });
         allowedPosts[1] = REVCroptopAllowedPost({
             category: 1,
-            minimumPrice: 10 ** (decimals - 1),
-            minimumTotalSupply: 100,
+            minimumPrice: 10 ** (decimals - 3),
+            minimumTotalSupply: 10_000,
             maximumTotalSupply: 999_999_999,
             allowedAddresses: new address[](0)
         });
         allowedPosts[2] = REVCroptopAllowedPost({
             category: 2,
-            minimumPrice: 10 ** decimals,
-            minimumTotalSupply: 10,
+            minimumPrice: 10 ** (decimals - 1),
+            minimumTotalSupply: 100,
             maximumTotalSupply: 999_999_999,
             allowedAddresses: new address[](0)
         });
         allowedPosts[3] = REVCroptopAllowedPost({
             category: 3,
+            minimumPrice: 10 ** decimals,
+            minimumTotalSupply: 10,
+            maximumTotalSupply: 999_999_999,
+            allowedAddresses: new address[](0)
+        });
+        allowedPosts[4] = REVCroptopAllowedPost({
+            category: 4,
             minimumPrice: 10 ** (decimals + 2),
             minimumTotalSupply: 10,
             maximumTotalSupply: 999_999_999,
