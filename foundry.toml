@@ -7,7 +7,10 @@ optimizer_runs = 100000000
 block_number = 14126430
 block_timestamp = 1643802347
 runs = 4096
-fs_permissions = [{ access = "read", path = "node_modules/@bananapus/core/broadcast/Deploy.s.sol" },{ access = "read", path = "node_modules/@bananapus/721-hook/broadcast/Deploy.s.sol" }, { access = "read", path = "node_modules/@bananapus/buyback-hook/broadcast/Deploy.s.sol" }, { access = "read", path = "node_modules/@rev-net/core/broadcast/Deploy.s.sol" }] # Get the deployment addresses to base the hook on.
+via_ir = true
+build_info = true
+extra_output = ['storageLayout']
+fs_permissions = [{ access = "read-write", path = "./"}]
 
 [profile.ci_sizes]
 optimizer_runs = 200
