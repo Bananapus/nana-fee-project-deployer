@@ -56,9 +56,7 @@ contract DeployScript is Script, Sphinx {
     /// @notice tracks the deployment of the buyback hook.
     BuybackDeployment buybackHook;
 
-
     FeeProjectConfig feeProjectConfig;
-
     bytes32 SALT = "NANA";
     address OPERATOR = 0x961d4191965C49537c88F764D88318872CE405bE;
     address TRUSTED_FORWARDER = 0xB2b5841DBeF766d4b521221732F9B618fCf34A87;
@@ -98,7 +96,7 @@ contract DeployScript is Script, Sphinx {
         );
         // Get the deployment addresses for the 721 hook contracts for this chain.
         buybackHook = BuybackDeploymentLib.getDeployment(
-            vm.envOr("NANA_BUYBACK_HOOK_DEPLOYMENT_PATH", string("node_modules@bananapus/buyback-hook/deployments/"))
+            vm.envOr("NANA_BUYBACK_HOOK_DEPLOYMENT_PATH", string("node_modules/@bananapus/buyback-hook/deployments/"))
         );
 
         feeProjectConfig = getBannyverseRevnetConfig();
@@ -165,7 +163,7 @@ contract DeployScript is Script, Sphinx {
         });
 
         // The project's allowed croptop posts.
-        REVCroptopAllowedPost[] memory allowedPosts = new REVCroptopAllowedPost[](5);
+        REVCroptopAllowedPost[] memory allowedPosts = new REVCroptopAllowedPost[](6);
         allowedPosts[0] = REVCroptopAllowedPost({
             category: 0,
             minimumPrice: 10 ** (decimals - 5),
@@ -219,6 +217,9 @@ contract DeployScript is Script, Sphinx {
         });
 
         // Specify the optimism sucker.
+        if(address(suckers.optimismDeployer) == address(0))
+            revert("Optimism sucker deployer is not configured on this network.");
+
         BPSuckerDeployerConfig[] memory suckerDeployerConfigurations = new BPSuckerDeployerConfig[](1);
         suckerDeployerConfigurations[0] = BPSuckerDeployerConfig({
             deployer: suckers.optimismDeployer,
