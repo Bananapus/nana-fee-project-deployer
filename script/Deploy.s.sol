@@ -118,7 +118,7 @@ contract Deploy is Script {
         uint40 oneDay = 86_400;
         uint40 start = uint40(block.timestamp);
 
-        // The tokens that the project accepts.
+        // The tokens that the project accepts and stores.
         address[] memory tokensToAccept = new address[](1);
 
         // Accept the chain's native currency through the multi terminal.
@@ -133,7 +133,7 @@ contract Deploy is Script {
         REVStageConfig[] memory stageConfigurations = new REVStageConfig[](1);
         stageConfigurations[0] = REVStageConfig({
             startsAtOrAfter: start,
-            operatorSplitRate: uint16(JBConstants.MAX_RESERVED_RATE / 5),
+            operatorSplitRate: uint16(JBConstants.MAX_RESERVED_RATE / 5), // 20%
             initialIssuanceRate: uint112(1000 * decimalMultiplier),
             priceCeilingIncreaseFrequency: 7 * oneDay,
             priceCeilingIncreasePercentage: uint32(JBConstants.MAX_DECAY_RATE / 100), // 1%
