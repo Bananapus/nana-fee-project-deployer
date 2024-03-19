@@ -57,7 +57,8 @@ contract DeployScript is Script, Sphinx {
     BuybackDeployment buybackHook;
 
     FeeProjectConfig feeProjectConfig;
-    bytes32 SALT = "NANA";
+    bytes32 SUCKER_SALT = "NANA_SUCKER";
+    bytes32 ERC20_SALT = "NANA_TOKEN";
     address OPERATOR = 0x961d4191965C49537c88F764D88318872CE405bE;
     address TRUSTED_FORWARDER = 0xB2b5841DBeF766d4b521221732F9B618fCf34A87;
 
@@ -99,13 +100,13 @@ contract DeployScript is Script, Sphinx {
             vm.envOr("NANA_BUYBACK_HOOK_DEPLOYMENT_PATH", string("node_modules/@bananapus/buyback-hook/deployments/"))
         );
 
-        feeProjectConfig = getBannyverseRevnetConfig();
+        feeProjectConfig = getNANARevnetConfig();
 
         // Perform the deployment transactions.
         deploy();
     }
-
-    function getBannyverseRevnetConfig() internal view returns (FeeProjectConfig memory){
+    
+    function getNANARevnetConfig() internal view returns (FeeProjectConfig memory){
        // Define constants
         string memory name = "Bananapus";
         string memory symbol = "$NANA";
@@ -116,7 +117,7 @@ contract DeployScript is Script, Sphinx {
         uint8 decimals = 18;
         uint256 decimalMultiplier = 10 ** decimals;
         uint40 oneDay = 86_400;
-        uint40 start = uint40(block.timestamp);
+        uint40 start = uint40(1710875417);
 
         // The tokens that the project accepts and stores.
         address[] memory tokensToAccept = new address[](1);
@@ -142,7 +143,7 @@ contract DeployScript is Script, Sphinx {
 
         // The project's revnet configuration
         REVConfig memory revnetConfiguration = REVConfig({
-            description: REVDescription(name, symbol, projectUri, SALT),
+            description: REVDescription(name, symbol, projectUri, ERC20_SALT),
             baseCurrency: nativeCurrency,
             premintTokenAmount: 37_000_000 * decimalMultiplier,
             initialOperator: OPERATOR,
@@ -228,7 +229,7 @@ contract DeployScript is Script, Sphinx {
 
         // Specify all sucker deployments.
         REVSuckerDeploymentConfig memory suckerDeploymentConfiguration =
-            REVSuckerDeploymentConfig({deployerConfigurations: suckerDeployerConfigurations, salt: SALT});
+            REVSuckerDeploymentConfig({deployerConfigurations: suckerDeployerConfigurations, salt: SUCKER_SALT});
 
         return FeeProjectConfig({
             configuration: revnetConfiguration,

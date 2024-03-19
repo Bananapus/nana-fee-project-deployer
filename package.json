@@ -22,6 +22,6 @@
         "@croptop/core": "github:xBA5ED/croptop-core#feat/sphinx",
         "@openzeppelin/contracts": "^5.0.1",
         "@rev-net/core": "github:rev-net/revnet-core#feat/sphinx",
-        "@sphinx-labs/plugins": "^0.30.6"
+        "@sphinx-labs/plugins": "^0.30.8"
     }
 }
