@@ -1,112 +1,113 @@
 // SPDX-License-Identifier: MIT
-pragma solidity ^0.8.23;
+pragma solidity 0.8.23;
 
-import {Script, stdJson} from "lib/forge-std/src/Script.sol";
-import {Strings} from "@openzeppelin/contracts/utils/Strings.sol";
+import "@bananapus/core/script/helpers/CoreDeploymentLib.sol";
+import "@bananapus/721-hook/script/helpers/Hook721DeploymentLib.sol";
+import "@bananapus/suckers/script/helpers/SuckerDeploymentLib.sol";
+import "@croptop/core/script/helpers/CroptopDeploymentLib.sol";
+import "@rev-net/core/script/helpers/RevnetCoreDeploymentLib.sol";
+import "@bananapus/buyback-hook/script/helpers/BuybackDeploymentLib.sol";
+
 import {JBConstants} from "@bananapus/core/src/libraries/JBConstants.sol";
 import {JBTerminalConfig} from "@bananapus/core/src/structs/JBTerminalConfig.sol";
-import {JBPayHookSpecification} from "@bananapus/core/src/structs/JBPayHookSpecification.sol";
-import {IJBTerminal} from "@bananapus/core/src/interfaces/terminal/IJBTerminal.sol";
-import {IJBRulesets} from "@bananapus/core/src/interfaces/IJBRulesets.sol";
-import {IJBPrices} from "@bananapus/core/src/interfaces/IJBPrices.sol";
-import {IJBBuybackHook} from "@bananapus/buyback-hook/src/interfaces/IJBBuybackHook.sol";
-import {IJB721TiersHookStore} from "@bananapus/721-hook/src/interfaces/IJB721TiersHookStore.sol";
-import {IJB721TokenUriResolver} from "@bananapus/721-hook/src/interfaces/IJB721TokenUriResolver.sol";
-import {JB721TierConfig} from "@bananapus/721-hook/src/structs/JB721TierConfig.sol";
-import {JB721TiersHookFlags} from "@bananapus/721-hook/src/structs/JB721TiersHookFlags.sol";
-import {JBDeploy721TiersHookConfig} from "@bananapus/721-hook/src/structs/JBDeploy721TiersHookConfig.sol";
-import {JB721InitTiersConfig} from "@bananapus/721-hook/src/structs/JB721InitTiersConfig.sol";
-import {JBDeploy721TiersHookConfig} from "@bananapus/721-hook/src/structs/JBDeploy721TiersHookConfig.sol";
-import {BPTokenMapping} from "@bananapus/suckers/src/structs/BPTokenMapping.sol";
-import {BPSuckerDeployerConfig} from "@bananapus/suckers/src/structs/BPSuckerDeployerConfig.sol";
-import {IBPSuckerDeployer} from "@bananapus/suckers/src/interfaces/IBPSuckerDeployer.sol";
 import {REVStageConfig} from "@rev-net/core/src/structs/REVStageConfig.sol";
-import {REVBuybackHookConfig} from "@rev-net/core/src/structs/REVBuybackHookConfig.sol";
-import {REVDeploy721TiersHookConfig} from "@rev-net/core/src/structs/REVDeploy721TiersHookConfig.sol";
-import {REVBuybackPoolConfig} from "@rev-net/core/src/structs/REVBuybackPoolConfig.sol";
-import {REVDescription} from "@rev-net/core/src/structs/REVDescription.sol";
 import {REVConfig} from "@rev-net/core/src/structs/REVConfig.sol";
 import {REVCroptopAllowedPost} from "@rev-net/core/src/structs/REVCroptopAllowedPost.sol";
-import {REVCroptopDeployer} from "@rev-net/core/src/REVCroptopDeployer.sol";
+import {REVBuybackPoolConfig} from "@rev-net/core/src/structs/REVBuybackPoolConfig.sol";
+import {REVBuybackHookConfig} from "@rev-net/core/src/structs/REVBuybackHookConfig.sol";
+import {JB721TierConfig} from "@bananapus/721-hook/src/structs/JB721TierConfig.sol";
+import {BPTokenMapping} from "@bananapus/suckers/src/structs/BPTokenMapping.sol";
+import {BPSuckerDeployerConfig} from "@bananapus/suckers/src/structs/BPSuckerDeployerConfig.sol";
 import {REVSuckerDeploymentConfig} from "@rev-net/core/src/structs/REVSuckerDeploymentConfig.sol";
+import {JBPayHookSpecification} from "@bananapus/core/src/structs/JBPayHookSpecification.sol";
+import {JB721InitTiersConfig} from "@bananapus/721-hook/src/structs/JB721InitTiersConfig.sol";
+import {JB721TiersHookFlags} from "@bananapus/721-hook/src/structs/JB721TiersHookFlags.sol";
+import {REVDescription} from "@rev-net/core/src/structs/REVDescription.sol";
+import {IJBPrices} from "@bananapus/core/src/interfaces/IJBPrices.sol";
+import {REVDeploy721TiersHookConfig} from "@rev-net/core/src/structs/REVDeploy721TiersHookConfig.sol";
+import {JBDeploy721TiersHookConfig} from "@bananapus/721-hook/src/structs/JBDeploy721TiersHookConfig.sol";
+import {IJB721TokenUriResolver} from "@bananapus/721-hook/src/interfaces/IJB721TokenUriResolver.sol";
 
-contract Deploy is Script {
-    function run() public {
-        // We need some pseudo-random bytes32.
-        bytes32 suckerSalt = keccak256(abi.encode(block.number, block.timestamp));
+import {Sphinx} from "@sphinx-labs/contracts/SphinxPlugin.sol";
+import {Script} from "forge-std/Script.sol";
 
-        // More pseudo-random bytes32.
-        bytes32 tokenSalt = keccak256(abi.encode(block.timestamp, block.number));
+struct FeeProjectConfig {
+    REVConfig configuration;
+    JBTerminalConfig[] terminalConfigurations;
+    REVBuybackHookConfig buybackHookConfiguration;
+    REVSuckerDeploymentConfig suckerDeploymentConfiguration;
+    REVDeploy721TiersHookConfig hookConfiguration;
+    JBPayHookSpecification[] otherPayHooksSpecifications;
+    uint16 extraHookMetadata;
+    REVCroptopAllowedPost[] allowedPosts;
+}
 
-        // Deploy to sepolia
-        _deployTo({rpc: "https://rpc.ankr.com/eth_sepolia", suckerSalt: suckerSalt, tokenSalt: tokenSalt});
+contract DeployScript is Script, Sphinx {
+    /// @notice tracks the deployment of the core contracts for the chain we are deploying to.
+    CoreDeployment core;
+    /// @notice tracks the deployment of the sucker contracts for the chain we are deploying to.
+    SuckerDeployment suckers;
+    /// @notice tracks the deployment of the croptop contracts for the chain we are deploying to.
+    CroptopDeployment croptop;
+    /// @notice tracks the deployment of the revnet contracts for the chain we are deploying to.
+    RevnetCoreDeployment revnet;
+    /// @notice tracks the deployment of the 721 hook contracts for the chain we are deploying to.
+    Hook721Deployment hook;
+    /// @notice tracks the deployment of the buyback hook.
+    BuybackDeployment buybackHook;
 
-        // Deploy to OP sepolia
-        // _deployTo({rpc: "https://rpc.ankr.com/optimism_sepolia", suckerSalt: suckerSalt, tokenSalt: tokenSalt});
+    FeeProjectConfig feeProjectConfig;
+    bytes32 SUCKER_SALT = "NANA_SUCKER";
+    bytes32 ERC20_SALT = "NANA_TOKEN";
+    address OPERATOR = 0x961d4191965C49537c88F764D88318872CE405bE;
+    address TRUSTED_FORWARDER = 0xB2b5841DBeF766d4b521221732F9B618fCf34A87;
+
+    function configureSphinx() public override {
+        // TODO: Update to contain revnet devs.
+        sphinxConfig.owners = [0x26416423d530b1931A2a7a6b7D435Fac65eED27d];
+        sphinxConfig.orgId = "cltepuu9u0003j58rjtbd0hvu";
+        sphinxConfig.projectName = "nana-fee-project";
+        sphinxConfig.threshold = 1;
+        sphinxConfig.mainnets = ["ethereum", "optimism"];
+        sphinxConfig.testnets = ["ethereum_sepolia", "optimism_sepolia"];
+        sphinxConfig.saltNonce = 10;
     }
 
-    function _deployTo(string memory rpc, bytes32 tokenSalt, bytes32 suckerSalt) private {
-        // vm.createSelectFork(rpc);
-        uint256 chainId = block.chainid;
-        address operator = 0x961d4191965C49537c88F764D88318872CE405bE;
-        address trustedForwarder;
-        string memory chain;
-        // Ethereun Mainnet
-        if (chainId == 1) {
-            trustedForwarder = 0xB2b5841DBeF766d4b521221732F9B618fCf34A87;
-            chain = "1";
-            // Ethereum Sepolia
-        } else if (chainId == 11_155_111) {
-            trustedForwarder = 0xB2b5841DBeF766d4b521221732F9B618fCf34A87;
-            chain = "11155111";
-            // Optimism Mainnet
-        } else if (chainId == 420) {
-            trustedForwarder = 0xB2b5841DBeF766d4b521221732F9B618fCf34A87;
-            chain = "420";
-            // Optimism Sepolia
-        } else if (chainId == 11_155_420) {
-            trustedForwarder = 0xB2b5841DBeF766d4b521221732F9B618fCf34A87;
-            chain = "11155420";
-            // Polygon Mainnet
-        } else if (chainId == 137) {
-            trustedForwarder = 0xB2b5841DBeF766d4b521221732F9B618fCf34A87;
-            chain = "137";
-            // Polygon Mumbai
-        } else if (chainId == 80_001) {
-            trustedForwarder = 0xB2b5841DBeF766d4b521221732F9B618fCf34A87;
-            chain = "80001";
-        } else {
-            revert("Invalid RPC / no juice contracts deployed on this network");
-        }
-
-        address multiTerminalAddress = _getDeploymentAddress(
-            string.concat("node_modules/@bananapus/core/broadcast/Deploy.s.sol/", chain, "/run-latest.json"),
-            "JBMultiTerminal"
+    function run() public {
+        // Get the deployment addresses for the nana CORE for this chain.
+        // We want to do this outside of the `sphinx` modifier.
+        core = CoreDeploymentLib.getDeployment(
+            vm.envOr("NANA_CORE_DEPLOYMENT_PATH", string("node_modules/@bananapus/core/deployments/"))
+        );
+        // Get the deployment addresses for the suckers contracts for this chain.
+        suckers = SuckerDeploymentLib.getDeployment(
+            vm.envOr("NANA_SUCKERS_DEPLOYMENT_PATH", string("node_modules/@bananapus/suckers/deployments/"))
+        );
+        // Get the deployment addresses for the 721 hook contracts for this chain.
+        croptop = CroptopDeploymentLib.getDeployment(
+            vm.envOr("CROPTOP_CORE_DEPLOYMENT_PATH", string("node_modules/@croptop/core/deployments/"))
+        );
+        // Get the deployment addresses for the 721 hook contracts for this chain.
+        revnet = RevnetCoreDeploymentLib.getDeployment(
+            vm.envOr("REVNET_CORE_DEPLOYMENT_PATH", string("node_modules/@rev-net/core/deployments/"))
+        );
+        // Get the deployment addresses for the 721 hook contracts for this chain.
+        hook = Hook721DeploymentLib.getDeployment(
+            vm.envOr("NANA_721_DEPLOYMENT_PATH", string("node_modules/@bananapus/721-hook/deployments/"))
+        );
+        // Get the deployment addresses for the 721 hook contracts for this chain.
+        buybackHook = BuybackDeploymentLib.getDeployment(
+            vm.envOr("NANA_BUYBACK_HOOK_DEPLOYMENT_PATH", string("node_modules/@bananapus/buyback-hook/deployments/"))
         );
 
-        address rulesetsAddress = _getDeploymentAddress(
-            string.concat("node_modules/@bananapus/core/broadcast/Deploy.s.sol/", chain, "/run-latest.json"),
-            "JBRulesets"
-        );
+        feeProjectConfig = getNANARevnetConfig();
 
-        address buybackHookAddress = _getDeploymentAddress(
-            string.concat("node_modules/@bananapus/buyback-hook/broadcast/Deploy.s.sol/", chain, "/run-latest.json"),
-            "JBBuybackHook"
-        );
-
-        address hookStoreAddress = _getDeploymentAddress(
-            string.concat("node_modules/@bananapus/721-hook/broadcast/Deploy.s.sol/", chain, "/run-latest.json"),
-            "JB721TiersHookStore"
-        );
-
-        address optimismSuckerDeployerAddress = 0xDBA108aE1738F456A0685f4C0aE30532385C4c24;
-
-        address revCroptopDeployerAddress = _getDeploymentAddress(
-            string.concat("node_modules/@rev-net/core/broadcast/Deploy.s.sol/", chain, "/run-latest.json"),
-            "REVCroptopDeployer"
-        );
-
-        // Define constants
+        // Perform the deployment transactions.
+        deploy();
+    }
+    
+    function getNANARevnetConfig() internal view returns (FeeProjectConfig memory){
+       // Define constants
         string memory name = "Bananapus";
         string memory symbol = "$NANA";
         string memory projectUri = "";
@@ -116,7 +117,7 @@ contract Deploy is Script {
         uint8 decimals = 18;
         uint256 decimalMultiplier = 10 ** decimals;
         uint40 oneDay = 86_400;
-        uint40 start = uint40(block.timestamp);
+        uint40 start = uint40(1710875417);
 
         // The tokens that the project accepts and stores.
         address[] memory tokensToAccept = new address[](1);
@@ -127,13 +128,13 @@ contract Deploy is Script {
         // The terminals that the project will accept funds through.
         JBTerminalConfig[] memory terminalConfigurations = new JBTerminalConfig[](1);
         terminalConfigurations[0] =
-            JBTerminalConfig({terminal: IJBTerminal(multiTerminalAddress), tokensToAccept: tokensToAccept});
+            JBTerminalConfig({terminal: core.terminal, tokensToAccept: tokensToAccept});
 
         // The project's revnet stage configurations.
         REVStageConfig[] memory stageConfigurations = new REVStageConfig[](1);
         stageConfigurations[0] = REVStageConfig({
             startsAtOrAfter: start,
-            operatorSplitRate: uint16(JBConstants.MAX_RESERVED_RATE / 5), // 20%
+            splitRate: uint16(JBConstants.MAX_RESERVED_RATE / 5), // 20%
             initialIssuanceRate: uint112(1000 * decimalMultiplier),
             priceCeilingIncreaseFrequency: 7 * oneDay,
             priceCeilingIncreasePercentage: uint32(JBConstants.MAX_DECAY_RATE / 100), // 1%
@@ -142,9 +143,11 @@ contract Deploy is Script {
 
         // The project's revnet configuration
         REVConfig memory revnetConfiguration = REVConfig({
+            description: REVDescription(name, symbol, projectUri, ERC20_SALT),
             baseCurrency: nativeCurrency,
             premintTokenAmount: 37_000_000 * decimalMultiplier,
-            initialOperator: operator,
+            premintChainId: 11155111,
+            initialSplitOperator: OPERATOR,
             stageConfigurations: stageConfigurations
         });
 
@@ -157,12 +160,12 @@ contract Deploy is Script {
             twapSlippageTolerance: 9000
         });
         REVBuybackHookConfig memory buybackHookConfiguration = REVBuybackHookConfig({
-            hook: IJBBuybackHook(buybackHookAddress),
+            hook: buybackHook.hook,
             poolConfigurations: buybackPoolConfigurations
         });
 
         // The project's allowed croptop posts.
-        REVCroptopAllowedPost[] memory allowedPosts = new REVCroptopAllowedPost[](5);
+        REVCroptopAllowedPost[] memory allowedPosts = new REVCroptopAllowedPost[](6);
         allowedPosts[0] = REVCroptopAllowedPost({
             category: 0,
             minimumPrice: 10 ** (decimals - 5),
@@ -216,22 +219,20 @@ contract Deploy is Script {
         });
 
         // Specify the optimism sucker.
+        if(address(suckers.optimismDeployer) == address(0))
+            revert("Optimism sucker deployer is not configured on this network.");
+
         BPSuckerDeployerConfig[] memory suckerDeployerConfigurations = new BPSuckerDeployerConfig[](1);
         suckerDeployerConfigurations[0] = BPSuckerDeployerConfig({
-            deployer: IBPSuckerDeployer(optimismSuckerDeployerAddress),
+            deployer: suckers.optimismDeployer,
             mappings: tokenMappings
         });
 
         // Specify all sucker deployments.
         REVSuckerDeploymentConfig memory suckerDeploymentConfiguration =
-            REVSuckerDeploymentConfig({deployerConfigurations: suckerDeployerConfigurations, salt: suckerSalt});
+            REVSuckerDeploymentConfig({deployerConfigurations: suckerDeployerConfigurations, salt: SUCKER_SALT});
 
-        // Deploy it all.
-        vm.startBroadcast();
-
-        // Deploy the $NANA Revnet.
-        REVCroptopDeployer(revCroptopDeployerAddress).deployCroptopRevnetWith({
-            description: REVDescription(name, symbol, projectUri, tokenSalt),
+        return FeeProjectConfig({
             configuration: revnetConfiguration,
             terminalConfigurations: terminalConfigurations,
             buybackHookConfiguration: buybackHookConfiguration,
@@ -240,7 +241,7 @@ contract Deploy is Script {
                 baseline721HookConfiguration: JBDeploy721TiersHookConfig({
                     name: name,
                     symbol: symbol,
-                    rulesets: IJBRulesets(rulesetsAddress),
+                    rulesets: core.rulesets,
                     baseUri: baseUri,
                     tokenUriResolver: IJB721TokenUriResolver(address(0)),
                     contractUri: contractUri,
@@ -251,7 +252,6 @@ contract Deploy is Script {
                         prices: IJBPrices(address(0))
                     }),
                     reserveBeneficiary: address(0),
-                    store: IJB721TiersHookStore(hookStoreAddress),
                     flags: JB721TiersHookFlags({
                         noNewTiersWithReserves: false,
                         noNewTiersWithVotes: false,
@@ -267,29 +267,19 @@ contract Deploy is Script {
             extraHookMetadata: 0,
             allowedPosts: allowedPosts
         });
-
-        vm.stopBroadcast();
     }
 
-    /// @notice Get the address of a contract that was deployed by the Deploy script.
-    /// @dev Reverts if the contract was not found.
-    /// @param path The path to the deployment file.
-    /// @param contractName The name of the contract to get the address of.
-    /// @return The address of the contract.
-    function _getDeploymentAddress(string memory path, string memory contractName) internal view returns (address) {
-        string memory deploymentJson = vm.readFile(path);
-        uint256 nOfTransactions = stdJson.readStringArray(deploymentJson, ".transactions").length;
-
-        for (uint256 i = 0; i < nOfTransactions; i++) {
-            string memory currentKey = string.concat(".transactions", "[", Strings.toString(i), "]");
-            string memory currentContractName =
-                stdJson.readString(deploymentJson, string.concat(currentKey, ".contractName"));
-
-            if (keccak256(abi.encodePacked(currentContractName)) == keccak256(abi.encodePacked(contractName))) {
-                return stdJson.readAddress(deploymentJson, string.concat(currentKey, ".contractAddress"));
-            }
-        }
-
-        revert(string.concat("Could not find contract with name '", contractName, "' in deployment file '", path, "'"));
+    function deploy() public sphinx {
+        // Deploy the NANA fee project.
+        revnet.croptop_deployer.deployCroptopRevnetWith({
+            configuration: feeProjectConfig.configuration,
+            terminalConfigurations: feeProjectConfig.terminalConfigurations,
+            buybackHookConfiguration: feeProjectConfig.buybackHookConfiguration,
+            suckerDeploymentConfiguration: feeProjectConfig.suckerDeploymentConfiguration,
+            hookConfiguration: feeProjectConfig.hookConfiguration,
+            otherPayHooksSpecifications: feeProjectConfig.otherPayHooksSpecifications,
+            extraHookMetadata: feeProjectConfig.extraHookMetadata,
+            allowedPosts: feeProjectConfig.allowedPosts
+        });
     }
 }
