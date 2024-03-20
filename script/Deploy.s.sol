@@ -134,7 +134,7 @@ contract DeployScript is Script, Sphinx {
         REVStageConfig[] memory stageConfigurations = new REVStageConfig[](1);
         stageConfigurations[0] = REVStageConfig({
             startsAtOrAfter: start,
-            operatorSplitRate: uint16(JBConstants.MAX_RESERVED_RATE / 5), // 20%
+            splitRate: uint16(JBConstants.MAX_RESERVED_RATE / 5), // 20%
             initialIssuanceRate: uint112(1000 * decimalMultiplier),
             priceCeilingIncreaseFrequency: 7 * oneDay,
             priceCeilingIncreasePercentage: uint32(JBConstants.MAX_DECAY_RATE / 100), // 1%
@@ -146,7 +146,8 @@ contract DeployScript is Script, Sphinx {
             description: REVDescription(name, symbol, projectUri, ERC20_SALT),
             baseCurrency: nativeCurrency,
             premintTokenAmount: 37_000_000 * decimalMultiplier,
-            initialOperator: OPERATOR,
+            premintChainId: 11155111,
+            initialSplitOperator: OPERATOR,
             stageConfigurations: stageConfigurations
         });
 
