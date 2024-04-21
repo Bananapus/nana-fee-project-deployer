@@ -111,6 +111,18 @@
   dependencies:
     regenerator-runtime "^0.14.0"
 
+"@bananapus/721-hook@^0.0.10":
+  version "0.0.10"
+  resolved "https://registry.yarnpkg.com/@bananapus/721-hook/-/721-hook-0.0.10.tgz#8765ab14a472e8867b92fd1703ffb8027f58a20c"
+  integrity sha512-fjIGfxFZNGhA3BH2+W5BJSVNOJZ6kUej8sdaEt+QVIaGPylB0zX3f/WiO7VC8Xaa2bFAaRIRvbQkBSzSUfaS8g==
+  dependencies:
+    "@bananapus/address-registry" "^0.0.4"
+    "@bananapus/core" "^0.0.12"
+    "@bananapus/ownable" "^0.0.6"
+    "@bananapus/permission-ids" "^0.0.5"
+    "@openzeppelin/contracts" "^5.0.2"
+    "@prb/math" "^4.0.2"
+
 "@bananapus/721-hook@^0.0.9":
   version "0.0.9"
   resolved "https://registry.yarnpkg.com/@bananapus/721-hook/-/721-hook-0.0.9.tgz#244d03f99c84fc6c1bb1dd835407bb388017f32a"
@@ -201,19 +213,19 @@
     "@openzeppelin/contracts" "^5.0.2"
     "@prb/math" "^4.0.2"
 
-"@bananapus/swap-terminal@^0.0.7":
-  version "0.0.7"
-  resolved "https://registry.yarnpkg.com/@bananapus/swap-terminal/-/swap-terminal-0.0.7.tgz#2e744a55ff3f09d6e7e5156c76475ecee81e4432"
-  integrity sha512-U8akahGyi1R2BeaA+Sjv/BQF8USR3Ipt5VAITaQC9OJnrkxcL7X4SbkkJlw+NQpBZ4ijebDI/F+9tvUrR5RVKA==
+"@bananapus/swap-terminal@^0.0.8":
+  version "0.0.8"
+  resolved "https://registry.yarnpkg.com/@bananapus/swap-terminal/-/swap-terminal-0.0.8.tgz#b166c8d2211ef1bd53d46c84bfac9248bbc7f72f"
+  integrity sha512-6Dh0luZV01WrAc5zXUZki4FMdeCSmGJzNEukCNF1phc9wO/5ZDN1yKLoLTLIeHINnhbv3gi85soZt0vAEQousA==
   dependencies:
     "@bananapus/core" "^0.0.12"
     "@bananapus/permission-ids" "^0.0.5"
-    "@exhausted-pigeon/uniswap-v3-foundry-pool" "github:exhausted-pigeon-srl/uniswap-v3-foundry-pool"
-    "@exhausted-pigeon/uniswap-v3-foundry-quote" "github:exhausted-pigeon-srl/uniswap-v3-foundry-quote"
+    "@exhausted-pigeon/uniswap-v3-foundry-pool" "^1.0.9"
+    "@exhausted-pigeon/uniswap-v3-foundry-quote" "^1.0.0"
     "@openzeppelin/contracts" "^5.0.2"
     "@uniswap/permit2" "github:Uniswap/permit2"
-    "@uniswap/v3-core" "github:Uniswap/v3-core#1.0"
-    "@uniswap/v3-periphery" "github:Uniswap/v3-periphery#1.3"
+    "@uniswap/v3-core" "github:Uniswap/v3-core#0.8"
+    "@uniswap/v3-periphery" "github:Uniswap/v3-periphery#0.8"
 
 "@chainlink/contracts@^0.8.0":
   version "0.8.0"
@@ -455,10 +467,10 @@
     human-id "^1.0.2"
     prettier "^2.7.1"
 
-"@croptop/core@^0.0.6":
-  version "0.0.6"
-  resolved "https://registry.yarnpkg.com/@croptop/core/-/core-0.0.6.tgz#35f3ebb242a60eb5940c04a040cbf525ac87c72b"
-  integrity sha512-XFYMG83dHuXTt6o/xIrMB2CLUsk89NZYdCWwXkYLvbpbq65FCp+4ig1L97n4Kqz7XxwkL/DEptBpFn74JLHgkw==
+"@croptop/core@^0.0.7":
+  version "0.0.7"
+  resolved "https://registry.yarnpkg.com/@croptop/core/-/core-0.0.7.tgz#ce2b636878715ee0f5d567c0dabfeface475c860"
+  integrity sha512-rlOdwu9THloMbNELimIYdN0fWPxAM/7T+ormqJMngoZv+LqE7+5m6rlSACjN3YyvPs3Q43XsZsOtmpRWS2+VKQ==
   dependencies:
     "@bananapus/721-hook" "^0.0.9"
     "@bananapus/core" "^0.0.12"
@@ -899,18 +911,18 @@
   dependencies:
     "@uniswap/v3-core" "^1.0.2-solc-0.8-simulate"
 
-"@exhausted-pigeon/uniswap-v3-foundry-pool@github:exhausted-pigeon-srl/uniswap-v3-foundry-pool":
-  version "1.0.3"
-  resolved "https://codeload.github.com/exhausted-pigeon-srl/uniswap-v3-foundry-pool/tar.gz/9ca359cebe38ed8feecea9eb8dc5d4b985c47724"
+"@exhausted-pigeon/uniswap-v3-foundry-pool@^1.0.9":
+  version "1.0.9"
+  resolved "https://registry.yarnpkg.com/@exhausted-pigeon/uniswap-v3-foundry-pool/-/uniswap-v3-foundry-pool-1.0.9.tgz#e522628546a961121ba294dc29d950f79ab75be6"
+  integrity sha512-DY0gUQTfqojyNfjcW0ru//D5TpjzAUfUuhoicW9J9tPVsksAeGB60312UN9XfySzF5jbprTQ1yyhFfTgHhUOZw==
   dependencies:
     "@openzeppelin/contracts" "^4.9.2"
     "@prb/math" "^4.0.1"
-    ds-test "https://github.com/dapphub/ds-test.git#e282159d5170298eb2455a6c05280ab5a73a4ef0"
-    forge-std "https://github.com/foundry-rs/forge-std.git#06c5a8f760f7d2392697cb092eda80c864e4fc06"
 
-"@exhausted-pigeon/uniswap-v3-foundry-quote@github:exhausted-pigeon-srl/uniswap-v3-foundry-quote":
+"@exhausted-pigeon/uniswap-v3-foundry-quote@^1.0.0":
   version "1.0.0"
-  resolved "https://codeload.github.com/exhausted-pigeon-srl/uniswap-v3-foundry-quote/tar.gz/5a3a8a06e5002d29f0809fa3e6af3ea5c956e278"
+  resolved "https://registry.yarnpkg.com/@exhausted-pigeon/uniswap-v3-foundry-quote/-/uniswap-v3-foundry-quote-1.0.0.tgz#270bcff9f9ab6fdbfe450df594afaf953846472e"
+  integrity sha512-PW+4D+Sn9i7qxHcVwWkpDuUCKunnxWQ23zCIrG97x13JPN7djiUEOd9PnZAG9GNfmoDz86JIMglxXsPy36YfSw==
   dependencies:
     "@uniswap/v3-core" "^1.0.2-solc-0.8-simulate"
 
@@ -1268,6 +1280,7 @@
     "@openzeppelin/contracts-upgradeable" "4.7.3"
 
 "@openzeppelin/contracts-upgradeable-4.7.3@npm:@openzeppelin/contracts-upgradeable@v4.7.3", "@openzeppelin/contracts-upgradeable@4.7.3":
+  name "@openzeppelin/contracts-upgradeable-4.7.3"
   version "4.7.3"
   resolved "https://registry.yarnpkg.com/@openzeppelin/contracts-upgradeable/-/contracts-upgradeable-4.7.3.tgz#f1d606e2827d409053f3e908ba4eb8adb1dd6995"
   integrity sha512-+wuegAMaLcZnLCJIvrVUDzA9z/Wp93f0Dla/4jJvIhijRrPabjQbZe6fWiECLaJyfn5ci9fqf9vTw3xpQOad2A==
@@ -1296,6 +1309,11 @@
   version "4.5.0"
   resolved "https://registry.yarnpkg.com/@openzeppelin/contracts/-/contracts-4.5.0.tgz#3fd75d57de172b3743cdfc1206883f56430409cc"
   integrity sha512-fdkzKPYMjrRiPK6K4y64e6GzULR7R7RwxSigHS8DDp7aWDeoReqsQI+cxHV1UuhAqX69L1lAaWDxenfP+xiqzA==
+
+"@openzeppelin/contracts@4.6.0":
+  version "4.6.0"
+  resolved "https://registry.yarnpkg.com/@openzeppelin/contracts/-/contracts-4.6.0.tgz#c91cf64bc27f573836dba4122758b4743418c1b3"
+  integrity sha512-8vi4d50NNya/bQqCmaVzvHNmwHvS0OBKb7HNtuNwEE3scXWrP31fKQoGxNMT+KbzmrNZzatE3QK5p2gFONI/hg==
 
 "@openzeppelin/contracts@4.7.3":
   version "4.7.3"
@@ -1383,10 +1401,10 @@
   resolved "https://registry.yarnpkg.com/@prb/math/-/math-4.0.2.tgz#0bcbc34eb2c49c56b70ded059d0af28c09b7833a"
   integrity sha512-kJgqvXR6iyU7+N959RzggSFhBdnRuSDnc/bs8u6MzdWw7aYIUaAr+uMVdpP6Dheypjerd7sfJgFOs19FRFhscg==
 
-"@rev-net/core@^0.0.17":
-  version "0.0.17"
-  resolved "https://registry.yarnpkg.com/@rev-net/core/-/core-0.0.17.tgz#7df30d9ade323ea8e049778f7a961aeab81f0398"
-  integrity sha512-s+G2s9R0CJI00PQANW+WTKDPT/B8YQcgMKhHxIKZDtCh2fbgMNLSLuoZpJVgtkEdf7HDWX9AG1mhs1+ZihrfRw==
+"@rev-net/core@^0.0.18":
+  version "0.0.18"
+  resolved "https://registry.yarnpkg.com/@rev-net/core/-/core-0.0.18.tgz#bb5be494e69964f59ca8e5072fe58cc162cd5338"
+  integrity sha512-13b1qJrV4PLUWV87TIGr/AZctxLy03GwbdfsohMqRN48Rrr5RfWRI+qezilNDIfqOWr85KJpqaUIz8rEJg+2mQ==
   dependencies:
     "@bananapus/721-hook" "^0.0.9"
     "@bananapus/buyback-hook" "^0.0.8"
@@ -1394,7 +1412,7 @@
     "@bananapus/ownable" "^0.0.6"
     "@bananapus/permission-ids" "^0.0.5"
     "@bananapus/suckers" "^0.0.7"
-    "@croptop/core" "^0.0.6"
+    "@croptop/core" "^0.0.7"
     "@openzeppelin/contracts" "^5.0.2"
 
 "@scroll-tech/contracts@0.1.0":
@@ -1617,6 +1635,15 @@
     ethers "^6.7.0"
     solmate "6.2.0"
 
+"@sphinx-labs/contracts@^0.21.10":
+  version "0.21.10"
+  resolved "https://registry.yarnpkg.com/@sphinx-labs/contracts/-/contracts-0.21.10.tgz#6f24af3ef9319847a9f249eb3918323c2b6b72f6"
+  integrity sha512-KffGOYoFi75MqFmQwgpAvxnma6UVldapQQcr/cvkDdZOk1d39k2VxHTFQ7hYFkJtAUCKXpx3GEPdKJClTCj1mA==
+  dependencies:
+    "@openzeppelin/contracts" "4.9.3"
+    ethers "^6.7.0"
+    solmate "6.2.0"
+
 "@sphinx-labs/core@^0.23.10":
   version "0.23.10"
   resolved "https://registry.yarnpkg.com/@sphinx-labs/core/-/core-0.23.10.tgz#bb736b400216da7cc9dfd1ed467103cefa259295"
@@ -1630,6 +1657,34 @@
     "@openzeppelin/hardhat-upgrades" "^1.22.1"
     "@openzeppelin/merkle-tree" "1.0.5"
     "@sphinx-labs/contracts" "^0.20.8"
+    axios "^1.4.0"
+    chalk "^4.1.2"
+    core-js "^3.27.1"
+    dotenv "^16.0.3"
+    ethers "^6.7.0"
+    fs "^0.0.1-security"
+    handlebars "^4.7.7"
+    insight "^0.11.1"
+    merkletreejs "^0.2.18"
+    ora "^5.4.1"
+    semver "^7.3.8"
+    solidity-ast "^0.4.45"
+    undici "^5.21.1"
+    yesno "^0.4.0"
+
+"@sphinx-labs/core@^0.24.8":
+  version "0.24.8"
+  resolved "https://registry.yarnpkg.com/@sphinx-labs/core/-/core-0.24.8.tgz#dfb1d364837aeb3c77f939f1b60c453ed1f8fcd0"
+  integrity sha512-yNveTOp/STU3ZCC3Pg8BKIHRooxF6WF4juA3nj2c+O1FU/CIOxeLu1DzMCffy5lGLwMSDolAIcSQ3iQGQQ43Dg==
+  dependencies:
+    "@amplitude/node" "^1.10.2"
+    "@eth-optimism/common-ts" "^0.7.1"
+    "@ethersproject/bignumber" "^5.7.0"
+    "@nomicfoundation/hardhat-ethers" "^3.0.4"
+    "@nomicfoundation/hardhat-verify" "^2.0.2"
+    "@openzeppelin/hardhat-upgrades" "^1.22.1"
+    "@openzeppelin/merkle-tree" "1.0.5"
+    "@sphinx-labs/contracts" "^0.21.10"
     axios "^1.4.0"
     chalk "^4.1.2"
     core-js "^3.27.1"
@@ -1671,6 +1726,37 @@
     solidity-ast "^0.4.52"
     sphinx-forge-std "https://github.com/foundry-rs/forge-std.git#v1.7.1"
     sphinx-solmate "npm:solmate@^6.7.0"
+    stream-chain "^2.2.5"
+    stream-json "^1.8.0"
+    ts-node "^10.9.1"
+    typescript "^5.1.3"
+    yargs "^17.7.2"
+    yesno "^0.4.0"
+
+"@sphinx-labs/plugins@^0.31.11":
+  version "0.31.11"
+  resolved "https://registry.yarnpkg.com/@sphinx-labs/plugins/-/plugins-0.31.11.tgz#85be4149675606d5cd6bb2734aa4ce65eea23047"
+  integrity sha512-07IXhFHLMRJO1/RlEcbK1uxIqMymmCvXgx5GISWnAJ6T4R8h/Oo3KPmbP8PhOMfOsE7dilFoszI6JVz1SHVx/A==
+  dependencies:
+    "@eth-optimism/contracts" "^0.5.40"
+    "@ethersproject/bignumber" "^5.7.0"
+    "@nomicfoundation/hardhat-ethers" "^3.0.5"
+    "@openzeppelin/contracts" "^4.8.1"
+    "@openzeppelin/hardhat-upgrades" "^1.22.1"
+    "@sphinx-labs/contracts" "^0.21.10"
+    "@sphinx-labs/core" "^0.24.8"
+    "@swc/core" "1.3.75"
+    chalk "^4.1.2"
+    core-js "^3.31.1"
+    dotenv "^16.0.3"
+    ethers "^6.7.0"
+    hardhat "2.20.1"
+    node-fetch "^2.6.7"
+    ora "^5.4.1"
+    p-limit "^3.1.0"
+    semver "^7.3.7"
+    sinon "^17.0.1"
+    solidity-ast "^0.4.52"
     stream-chain "^2.2.5"
     stream-json "^1.8.0"
     ts-node "^10.9.1"
@@ -1880,19 +1966,18 @@
   resolved "https://registry.yarnpkg.com/@uniswap/v3-core/-/v3-core-1.0.2-solc-0.8-simulate.tgz#77fb42f2b502b4fec81844736d039fc059e8688c"
   integrity sha512-ALAZbsb3wvUrRzeAjrTKjv1fH7UrueJ/+D8uX4yintXHxxzbnnp78Kis2pa4D26cFQ72rwM3DrZpUES9rhsEuQ==
 
-"@uniswap/v3-core@github:Uniswap/v3-core#1.0":
-  version "1.0.0"
-  resolved "https://codeload.github.com/Uniswap/v3-core/tar.gz/e3589b192d0be27e100cd0daaf6c97204fdb1899"
+"@uniswap/v3-core@github:Uniswap/v3-core#0.8":
+  version "1.0.1-solc-0.8"
+  resolved "https://codeload.github.com/Uniswap/v3-core/tar.gz/6562c52e8f75f0c10f9deaf44861847585fc8129"
 
-"@uniswap/v3-periphery@github:Uniswap/v3-periphery#1.3":
-  version "1.3.0"
-  resolved "https://codeload.github.com/Uniswap/v3-periphery/tar.gz/80f26c86c57b8a5e4b913f42844d4c8bd274d058"
+"@uniswap/v3-periphery@github:Uniswap/v3-periphery#0.8":
+  version "1.4.2-solc-0.8"
+  resolved "https://codeload.github.com/Uniswap/v3-periphery/tar.gz/b325bb0905d922ae61fcc7df85ee802e8df5e96c"
   dependencies:
-    "@openzeppelin/contracts" "3.4.1-solc-0.7-2"
-    "@uniswap/lib" "^4.0.1-alpha"
+    "@openzeppelin/contracts" "4.6.0"
     "@uniswap/v2-core" "1.0.1"
-    "@uniswap/v3-core" "1.0.0"
-    base64-sol "1.0.1"
+    "@uniswap/v3-core" "1.0.2-solc-0.8-simulate"
+    base64-sol "1.1.0"
     hardhat-watcher "^2.1.1"
 
 "@uniswap/v3-periphery@github:uniswap/v3-periphery#1.3":
@@ -2249,6 +2334,11 @@ base64-sol@1.0.1:
   version "1.0.1"
   resolved "https://registry.yarnpkg.com/base64-sol/-/base64-sol-1.0.1.tgz#91317aa341f0bc763811783c5729f1c2574600f6"
   integrity sha512-ld3cCNMeXt4uJXmLZBHFGMvVpK9KsLVEhPpFRXnvSVAqABKbuNZg/+dsq3NuM+wxFLb/UrVkz7m1ciWmkMfTbg==
+
+base64-sol@1.1.0:
+  version "1.1.0"
+  resolved "https://registry.yarnpkg.com/base64-sol/-/base64-sol-1.1.0.tgz#39c3c91a35790b6eb3b8e73114b46bacf0fc2865"
+  integrity sha512-mksLxtFyBcXd3LYK5UxyMj29YR//zoaeXpJaKRbnLQC0E99oCJl7VpKaJDXWAuTvnhxBU9XNYzhxSL8umsrxWg==
 
 basic-auth@~2.0.1:
   version "2.0.1"
@@ -3053,10 +3143,6 @@ dotenv@^8.1.0:
   resolved "https://registry.yarnpkg.com/dotenv/-/dotenv-8.6.0.tgz#061af664d19f7f4d8fc6e4ff9b584ce237adcb8b"
   integrity sha512-IrPdXQsk2BbzvCBGBOTmmSH5SodmqZNt4ERAZDmW4CT+tL8VtvinqywuANaFu4bOMWki16nqf0e4oC0QIaDr/g==
 
-"ds-test@https://github.com/dapphub/ds-test.git#e282159d5170298eb2455a6c05280ab5a73a4ef0":
-  version "1.0.0"
-  resolved "https://github.com/dapphub/ds-test.git#e282159d5170298eb2455a6c05280ab5a73a4ef0"
-
 duplexify@^4.1.1:
   version "4.1.3"
   resolved "https://registry.yarnpkg.com/duplexify/-/duplexify-4.1.3.tgz#a07e1c0d0a2c001158563d32592ba58bddb0236f"
@@ -3659,10 +3745,6 @@ forever-agent@~0.6.1:
   version "0.6.1"
   resolved "https://registry.yarnpkg.com/forever-agent/-/forever-agent-0.6.1.tgz#fbc71f0c41adeb37f96c577ad1ed42d8fdacca91"
   integrity sha512-j0KLYPhm6zeac4lz3oJ3o65qvgQCcPubiyotZrXqEaG4hNagNYO8qdlUrX5vwqv9ohqeT/Z3j6+yW067yWWdUw==
-
-"forge-std@https://github.com/foundry-rs/forge-std.git#06c5a8f760f7d2392697cb092eda80c864e4fc06":
-  version "1.5.3"
-  resolved "https://github.com/foundry-rs/forge-std.git#06c5a8f760f7d2392697cb092eda80c864e4fc06"
 
 form-data@^4.0.0:
   version "4.0.0"

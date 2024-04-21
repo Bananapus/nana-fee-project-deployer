@@ -9,6 +9,8 @@ import "@rev-net/core/script/helpers/RevnetCoreDeploymentLib.sol";
 import "@bananapus/buyback-hook/script/helpers/BuybackDeploymentLib.sol";
 import "@bananapus/swap-terminal/script/helpers/SwapTerminalDeploymentLib.sol";
 
+import {JBPermissionIds} from "@bananapus/permission-ids/src/JBPermissionIds.sol";
+import {JBPermissionsData} from "@bananapus/core/src/structs/JBPermissionsData.sol";
 import {JBConstants} from "@bananapus/core/src/libraries/JBConstants.sol";
 import {JBTerminalConfig} from "@bananapus/core/src/structs/JBTerminalConfig.sol";
 import {REVStageConfig} from "@rev-net/core/src/structs/REVStageConfig.sol";
@@ -57,7 +59,7 @@ contract DeployScript is Script, Sphinx {
     /// @notice tracks the deployment of the buyback hook.
     BuybackDeployment buybackHook;
     /// @notice tracks the deployment of the swap terminal.
-    SwapTerminalDeploymentLib swapTerminal;
+    SwapTerminalDeployment swapTerminal;
 
     FeeProjectConfig feeProjectConfig;
     bytes32 SUCKER_SALT = "NANA_SUCKER";
@@ -278,7 +280,33 @@ contract DeployScript is Script, Sphinx {
         });
     }
 
-    function deploy() public sphinx {
+     function deploy() public sphinx {
+        // The permissions required to configure a revnet.
+        uint256[] memory _permissions = new uint256[](6);
+        _permissions[0] = JBPermissionIds.QUEUE_RULESETS;
+        _permissions[1] = JBPermissionIds.DEPLOY_ERC20;
+        _permissions[2] = JBPermissionIds.SET_BUYBACK_POOL;
+        _permissions[3] = JBPermissionIds.SET_SPLIT_GROUPS; 
+        _permissions[4] = JBPermissionIds.MAP_SUCKER_TOKEN; 
+        _permissions[5] = JBPermissionIds.DEPLOY_SUCKERS; 
+
+        // Give the permissions to the croptop deployer.
+        core.permissions.setPermissionsFor(safeAddress(), JBPermissionsData({
+            operator: address(revnet.croptop_deployer),
+            projectId: 1,
+            permissionIds: _permissions
+        }));
+
+        // Give the permissions to the sucker registry.
+        // TODO: Check if this is actually needed. And if it is, why is it needed?
+        uint256[] memory _registryPermissions = new uint256[](1);
+        _registryPermissions[0] = JBPermissionIds.MAP_SUCKER_TOKEN; 
+        core.permissions.setPermissionsFor(safeAddress(), JBPermissionsData({
+            operator: address(suckers.registry),
+            projectId: 1,
+            permissionIds: _registryPermissions
+        }));
+
         // Deploy the NANA fee project.
         revnet.croptop_deployer.launchCroptopRevnetFor({
             revnetId: 1,
@@ -291,5 +319,8 @@ contract DeployScript is Script, Sphinx {
             extraHookMetadata: feeProjectConfig.extraHookMetadata,
             allowedPosts: feeProjectConfig.allowedPosts
         });
+
+        // Tranfer ownership.
+        core.projects.transferFrom(safeAddress(), address(revnet.croptop_deployer), 1);
     }
 }
