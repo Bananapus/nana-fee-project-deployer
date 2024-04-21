@@ -280,7 +280,8 @@ contract DeployScript is Script, Sphinx {
 
     function deploy() public sphinx {
         // Deploy the NANA fee project.
-        revnet.croptop_deployer.deployCroptopRevnetWith({
+        revnet.croptop_deployer.launchCroptopRevnetFor({
+            revnetId: 1,
             configuration: feeProjectConfig.configuration,
             terminalConfigurations: feeProjectConfig.terminalConfigurations,
             buybackHookConfiguration: feeProjectConfig.buybackHookConfiguration,
