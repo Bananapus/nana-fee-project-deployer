@@ -7,6 +7,7 @@ import "@bananapus/suckers/script/helpers/SuckerDeploymentLib.sol";
 import "@croptop/core/script/helpers/CroptopDeploymentLib.sol";
 import "@rev-net/core/script/helpers/RevnetCoreDeploymentLib.sol";
 import "@bananapus/buyback-hook/script/helpers/BuybackDeploymentLib.sol";
+import "@bananapus/swap-terminal/script/helpers/SwapTerminalDeploymentLib.sol";
 
 import {JBConstants} from "@bananapus/core/src/libraries/JBConstants.sol";
 import {JBTerminalConfig} from "@bananapus/core/src/structs/JBTerminalConfig.sol";
@@ -55,6 +56,8 @@ contract DeployScript is Script, Sphinx {
     Hook721Deployment hook;
     /// @notice tracks the deployment of the buyback hook.
     BuybackDeployment buybackHook;
+    /// @notice tracks the deployment of the swap terminal.
+    SwapTerminalDeploymentLib swapTerminal;
 
     FeeProjectConfig feeProjectConfig;
     bytes32 SUCKER_SALT = "NANA_SUCKER";
@@ -99,6 +102,10 @@ contract DeployScript is Script, Sphinx {
         buybackHook = BuybackDeploymentLib.getDeployment(
             vm.envOr("NANA_BUYBACK_HOOK_DEPLOYMENT_PATH", string("node_modules/@bananapus/buyback-hook/deployments/"))
         );
+        // Get the deployment addresses for the 721 hook contracts for this chain.
+        swapTerminal = SwapTerminalDeploymentLib.getDeployment(
+            vm.envOr("NANA_SWAP_TERMINAL_DEPLOYMENT_PATH", string("node_modules/@bananapus/swap-terminal/deployments/"))
+        );
 
         feeProjectConfig = getNANARevnetConfig();
 
@@ -126,9 +133,11 @@ contract DeployScript is Script, Sphinx {
         tokensToAccept[0] = JBConstants.NATIVE_TOKEN;
 
         // The terminals that the project will accept funds through.
-        JBTerminalConfig[] memory terminalConfigurations = new JBTerminalConfig[](1);
+        JBTerminalConfig[] memory terminalConfigurations = new JBTerminalConfig[](2);
         terminalConfigurations[0] =
             JBTerminalConfig({terminal: core.terminal, tokensToAccept: tokensToAccept});
+        terminalConfigurations[1] =
+            JBTerminalConfig({terminal: swapTerminal.swap_terminal, tokensToAccept: new address[](0)});   
 
         // The project's revnet stage configurations.
         REVStageConfig[] memory stageConfigurations = new REVStageConfig[](1);
