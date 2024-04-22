@@ -73,8 +73,8 @@ contract DeployScript is Script, Sphinx {
         sphinxConfig.orgId = "cltepuu9u0003j58rjtbd0hvu";
         sphinxConfig.projectName = "nana-fee-project";
         sphinxConfig.threshold = 1;
-        sphinxConfig.mainnets = ["ethereum", "optimism"];
-        sphinxConfig.testnets = ["ethereum_sepolia", "optimism_sepolia"];
+        sphinxConfig.mainnets = ["ethereum", "optimism", "base", "arbitrum"];
+        sphinxConfig.testnets = ["ethereum_sepolia", "optimism_sepolia", "base_sepolia"];
         sphinxConfig.saltNonce = 10;
     }
 
@@ -229,16 +229,35 @@ contract DeployScript is Script, Sphinx {
             minBridgeAmount: 0.01 ether
         });
 
-        // Specify the optimism sucker.
-        if(address(suckers.optimismDeployer) == address(0))
-            revert("Optimism sucker deployer is not configured on this network.");
+        BPSuckerDeployerConfig[] memory suckerDeployerConfigurations; 
+        if (block.chainid == 1 || block.chainid == 11155111) {
+            suckerDeployerConfigurations = new BPSuckerDeployerConfig[](2);
+            // OP 
+            suckerDeployerConfigurations[0] = BPSuckerDeployerConfig({
+                deployer: suckers.optimismDeployer,
+                mappings: tokenMappings
+            });
 
-        BPSuckerDeployerConfig[] memory suckerDeployerConfigurations = new BPSuckerDeployerConfig[](1);
-        suckerDeployerConfigurations[0] = BPSuckerDeployerConfig({
-            deployer: suckers.optimismDeployer,
-            mappings: tokenMappings
-        });
+            suckerDeployerConfigurations[1] = BPSuckerDeployerConfig({
+                deployer: suckers.baseDeployer,
+                mappings: tokenMappings
+            });
 
+            // suckerDeployerConfigurations[2] = BPSuckerDeployerConfig({
+            //     deployer: suckers.arbitrumDeployer,
+            //     mappings: tokenMappings
+            // });
+        } else {
+            suckerDeployerConfigurations = new BPSuckerDeployerConfig[](1);
+            // L2 -> Mainnet 
+            suckerDeployerConfigurations[0] = BPSuckerDeployerConfig({
+                deployer: address(suckers.optimismDeployer) != address(0) ? suckers.optimismDeployer : address(suckers.baseDeployer) != address(0) ? suckers.baseDeployer : suckers.arbitrumDeployer,
+                mappings: tokenMappings
+            });
+
+            if(address(suckerDeployerConfigurations[0].deployer) == address(0)) revert("L2 > L1 Sucker is not configured");
+        }
+        
         // Specify all sucker deployments.
         REVSuckerDeploymentConfig memory suckerDeploymentConfiguration =
             REVSuckerDeploymentConfig({deployerConfigurations: suckerDeployerConfigurations, salt: SUCKER_SALT});
