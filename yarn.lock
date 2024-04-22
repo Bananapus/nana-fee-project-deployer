@@ -175,10 +175,10 @@
   resolved "https://registry.yarnpkg.com/@bananapus/permission-ids/-/permission-ids-0.0.5.tgz#1861094d38e3dc6b3339724abb03d3658a0ed91a"
   integrity sha512-eC1Pkon47hth4z4dRDOACTJICsLLZf/9KH4W+9VUXQMcT3+4UbzNZ3kw2gJ3WdkuFZgIQLjNZt1oQ68RP29KRg==
 
-"@bananapus/suckers@^0.0.8":
-  version "0.0.8"
-  resolved "https://registry.yarnpkg.com/@bananapus/suckers/-/suckers-0.0.8.tgz#314bc60affa1718bbff5ca11279699235d1ad1ab"
-  integrity sha512-KF83+lL2UGdCfOqZTadwySUVvXQOgWDY3x9cjPK0FZAeIsK7931JnhkrwluhbJGOsbhlJCShP7Saxqb1LtZvjg==
+"@bananapus/suckers@^0.0.10":
+  version "0.0.10"
+  resolved "https://registry.yarnpkg.com/@bananapus/suckers/-/suckers-0.0.10.tgz#39c7389cc921479ef166c29b8e1bf160af60b1aa"
+  integrity sha512-wkAGDP2jioxyZJJy8v9oOFi2otcDgGXb5ZaEXTUG+qFI11rJddTD50alT8zGTlrPd92ae98R5jDk804V3LMjRQ==
   dependencies:
     "@arbitrum/nitro-contracts" "github:OffchainLabs/nitro-contracts"
     "@bananapus/core" "^0.0.13"
@@ -187,10 +187,10 @@
     "@openzeppelin/contracts" "^5.0.2"
     "@prb/math" "^4.0.2"
 
-"@bananapus/suckers@^0.0.9":
-  version "0.0.9"
-  resolved "https://registry.yarnpkg.com/@bananapus/suckers/-/suckers-0.0.9.tgz#32ad311485ee755d0170abc07cfe4645b36972d5"
-  integrity sha512-8UnB3xULq0KBmNECnJshr085OO5rgxeeZBkN2OA61FAsYOhOWRsH7ygRh2rD4qr6e+Dn+YuCiQiwiaV3BdBP9A==
+"@bananapus/suckers@^0.0.8":
+  version "0.0.8"
+  resolved "https://registry.yarnpkg.com/@bananapus/suckers/-/suckers-0.0.8.tgz#314bc60affa1718bbff5ca11279699235d1ad1ab"
+  integrity sha512-KF83+lL2UGdCfOqZTadwySUVvXQOgWDY3x9cjPK0FZAeIsK7931JnhkrwluhbJGOsbhlJCShP7Saxqb1LtZvjg==
   dependencies:
     "@arbitrum/nitro-contracts" "github:OffchainLabs/nitro-contracts"
     "@bananapus/core" "^0.0.13"
