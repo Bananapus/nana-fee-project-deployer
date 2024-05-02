@@ -13,7 +13,7 @@ import {JBPermissionIds} from "@bananapus/permission-ids/src/JBPermissionIds.sol
 import {JBPermissionsData} from "@bananapus/core/src/structs/JBPermissionsData.sol";
 import {JBConstants} from "@bananapus/core/src/libraries/JBConstants.sol";
 import {JBTerminalConfig} from "@bananapus/core/src/structs/JBTerminalConfig.sol";
-import {REVStageConfig} from "@rev-net/core/src/structs/REVStageConfig.sol";
+import {REVStageConfig, REVMintConfig} from "@rev-net/core/src/structs/REVStageConfig.sol";
 import {REVConfig} from "@rev-net/core/src/structs/REVConfig.sol";
 import {REVCroptopAllowedPost} from "@rev-net/core/src/structs/REVCroptopAllowedPost.sol";
 import {REVBuybackPoolConfig} from "@rev-net/core/src/structs/REVBuybackPoolConfig.sol";
@@ -74,7 +74,7 @@ contract DeployScript is Script, Sphinx {
         sphinxConfig.projectName = "nana-fee-project";
         sphinxConfig.threshold = 1;
         sphinxConfig.mainnets = ["ethereum", "optimism", "base", "arbitrum"];
-        sphinxConfig.testnets = ["ethereum_sepolia", "optimism_sepolia", "base_sepolia"];
+        sphinxConfig.testnets = ["ethereum_sepolia", "optimism_sepolia", "base_sepolia", "arbitrum_sepolia"];
         sphinxConfig.saltNonce = 10;
     }
 
@@ -140,10 +140,18 @@ contract DeployScript is Script, Sphinx {
             JBTerminalConfig({terminal: core.terminal, tokensToAccept: tokensToAccept});
         terminalConfigurations[1] =
             JBTerminalConfig({terminal: swapTerminal.swap_terminal, tokensToAccept: new address[](0)});   
-
+        
+        REVMintConfig[] memory mintConfs = new REVMintConfig[](1);
+        mintConfs[0] = REVMintConfig({
+            chainId: 11155111,
+            count: 37_000_000 * decimalMultiplier,
+            beneficiary: OPERATOR 
+        });
+            
         // The project's revnet stage configurations.
         REVStageConfig[] memory stageConfigurations = new REVStageConfig[](1);
         stageConfigurations[0] = REVStageConfig({
+            mintConfigs: mintConfs, 
             startsAtOrAfter: start,
             splitRate: uint16(JBConstants.MAX_RESERVED_RATE / 5), // 20%
             initialIssuanceRate: uint112(1000 * decimalMultiplier),
@@ -156,8 +164,6 @@ contract DeployScript is Script, Sphinx {
         REVConfig memory revnetConfiguration = REVConfig({
             description: REVDescription(name, symbol, projectUri, ERC20_SALT),
             baseCurrency: nativeCurrency,
-            premintTokenAmount: 37_000_000 * decimalMultiplier,
-            premintChainId: 11155111,
             initialSplitOperator: OPERATOR,
             stageConfigurations: stageConfigurations
         });
