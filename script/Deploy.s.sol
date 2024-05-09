@@ -126,7 +126,7 @@ contract DeployScript is Script, Sphinx {
         uint8 decimals = 18;
         uint256 decimalMultiplier = 10 ** decimals;
         uint40 oneDay = 86_400;
-        uint40 start = uint40(1710875417);
+        uint40 start = block.timestamp;
 
         // The tokens that the project accepts and stores.
         address[] memory tokensToAccept = new address[](1);
