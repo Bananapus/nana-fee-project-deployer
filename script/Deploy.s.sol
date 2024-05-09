@@ -307,13 +307,12 @@ contract DeployScript is Script, Sphinx {
 
      function deploy() public sphinx {
         // The permissions required to configure a revnet.
-        uint256[] memory _permissions = new uint256[](6);
+        uint256[] memory _permissions = new uint256[](5);
         _permissions[0] = JBPermissionIds.QUEUE_RULESETS;
         _permissions[1] = JBPermissionIds.DEPLOY_ERC20;
         _permissions[2] = JBPermissionIds.SET_BUYBACK_POOL;
         _permissions[3] = JBPermissionIds.SET_SPLIT_GROUPS; 
-        _permissions[4] = JBPermissionIds.MAP_SUCKER_TOKEN; 
-        _permissions[5] = JBPermissionIds.DEPLOY_SUCKERS; 
+        _permissions[4] = JBPermissionIds.DEPLOY_SUCKERS; 
 
         // Give the permissions to the croptop deployer.
         core.permissions.setPermissionsFor(safeAddress(), JBPermissionsData({
@@ -323,7 +322,6 @@ contract DeployScript is Script, Sphinx {
         }));
 
         // Give the permissions to the sucker registry.
-        // TODO: Check if this is actually needed. And if it is, why is it needed?
         uint256[] memory _registryPermissions = new uint256[](1);
         _registryPermissions[0] = JBPermissionIds.MAP_SUCKER_TOKEN; 
         core.permissions.setPermissionsFor(safeAddress(), JBPermissionsData({
