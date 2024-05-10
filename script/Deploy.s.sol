@@ -221,7 +221,7 @@ contract DeployScript is Script, Sphinx {
         allowedPosts[5] = REVCroptopAllowedPost({
             category: 5,
             minimumPrice: 10 ** (decimals + 2),
-            minimumTotalSupply: 10,
+            minimumTotalSupply: 7,
             maximumTotalSupply: 999_999_999,
             allowedAddresses: new address[](0)
         });
