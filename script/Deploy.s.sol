@@ -307,14 +307,15 @@ contract DeployScript is Script, Sphinx {
 
      function deploy() public sphinx {
         // The permissions required to configure a revnet.
-        uint256[] memory _permissions = new uint256[](5);
+        uint256[] memory _permissions = new uint256[](6);
         _permissions[0] = JBPermissionIds.QUEUE_RULESETS;
-        _permissions[1] = JBPermissionIds.DEPLOY_ERC20;
-        _permissions[2] = JBPermissionIds.SET_BUYBACK_POOL;
-        _permissions[3] = JBPermissionIds.SET_SPLIT_GROUPS; 
-        _permissions[4] = JBPermissionIds.DEPLOY_SUCKERS; 
+        _permissions[1] = JBPermissionIds.SET_TERMINALS;
+        _permissions[2] = JBPermissionIds.DEPLOY_ERC20;
+        _permissions[3] = JBPermissionIds.SET_BUYBACK_POOL;
+        _permissions[4] = JBPermissionIds.SET_SPLIT_GROUPS; 
+        _permissions[5] = JBPermissionIds.DEPLOY_SUCKERS; 
 
-        // Give the permissions to the croptop deployer.
+       // Give the permissions to the croptop deployer.
         core.permissions.setPermissionsFor(safeAddress(), JBPermissionsData({
             operator: address(revnet.croptop_deployer),
             projectId: 1,
