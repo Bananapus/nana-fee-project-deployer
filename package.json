@@ -1,6 +1,6 @@
 {
     "name": "@bananapus/fee-project-deployer",
-    "version": "0.0.2",
+    "version": "0.0.3",
     "license": "MIT",
     "repository": {
         "type": "git",
@@ -12,8 +12,8 @@
     "scripts": {
         "test": "forge test",
         "coverage:integration": "forge coverage --match-path \"./src/*.sol\" --report lcov --report summary",
-        "deploy:mainnets": "source ./.env && npx sphinx propose ./script/Deploy.s.sol --networks mainnets",
-        "deploy:testnets": "source ./.env && npx sphinx propose ./script/Deploy.s.sol --networks testnets",
+        "deploy:mainnets": "source ./.env && export START_TIME=$(date +%s) && npx sphinx propose ./script/Deploy.s.sol --networks mainnets",
+        "deploy:testnets": "source ./.env && export START_TIME=$(date +%s) && npx sphinx propose ./script/Deploy.s.sol --networks testnets",
         "artifacts": "source ./.env && npx sphinx artifacts --org-id 'cltepuu9u0003j58rjtbd0hvu' --project-name 'nana-fee-project'"
     },
     "dependencies": {

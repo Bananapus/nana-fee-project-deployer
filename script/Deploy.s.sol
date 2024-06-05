@@ -66,16 +66,13 @@ contract DeployScript is Script, Sphinx {
     bytes32 ERC20_SALT = "NANA_TOKEN";
     address OPERATOR = 0x961d4191965C49537c88F764D88318872CE405bE;
     address TRUSTED_FORWARDER = 0xB2b5841DBeF766d4b521221732F9B618fCf34A87;
+    uint256 TIME_UNTIL_START = 1 days;
 
     function configureSphinx() public override {
         // TODO: Update to contain revnet devs.
-        sphinxConfig.owners = [0x26416423d530b1931A2a7a6b7D435Fac65eED27d];
-        sphinxConfig.orgId = "cltepuu9u0003j58rjtbd0hvu";
         sphinxConfig.projectName = "nana-fee-project";
-        sphinxConfig.threshold = 1;
         sphinxConfig.mainnets = ["ethereum", "optimism", "base", "arbitrum"];
         sphinxConfig.testnets = ["ethereum_sepolia", "optimism_sepolia", "base_sepolia", "arbitrum_sepolia"];
-        sphinxConfig.saltNonce = 10;
     }
 
     function run() public {
@@ -111,12 +108,25 @@ contract DeployScript is Script, Sphinx {
 
         feeProjectConfig = getNANARevnetConfig();
 
+        // Since Juicebox has logic dependent on the timestamp we warp time to create a scenario closer to production.
+        // We force simulations to make the assumption that the `START_TIME` has not occured,
+        // and is not the current time.
+        // Because of the cross-chain allowing components of nana-core, all chains require the same start_time,
+        // for this reason we can't rely on the simulations block.time and we need a shared timestamp across all
+        // simulations.
+        uint256 _realTimestamp = vm.envUint("START_TIME");
+        if (_realTimestamp <= block.timestamp - 1 days) {
+            revert("Something went wrong while setting the 'START_TIME' environment variable.");
+        }
+
+        vm.warp(_realTimestamp);
+
         // Perform the deployment transactions.
         deploy();
     }
-    
-    function getNANARevnetConfig() internal view returns (FeeProjectConfig memory){
-       // Define constants
+
+    function getNANARevnetConfig() internal view returns (FeeProjectConfig memory) {
+        // Define constants
         string memory name = "Bananapus";
         string memory symbol = "$NANA";
         string memory projectUri = "";
@@ -125,8 +135,6 @@ contract DeployScript is Script, Sphinx {
         uint32 nativeCurrency = uint32(uint160(JBConstants.NATIVE_TOKEN));
         uint8 decimals = 18;
         uint256 decimalMultiplier = 10 ** decimals;
-        uint40 oneDay = 86_400;
-        uint40 start = block.timestamp;
 
         // The tokens that the project accepts and stores.
         address[] memory tokensToAccept = new address[](1);
@@ -136,26 +144,22 @@ contract DeployScript is Script, Sphinx {
 
         // The terminals that the project will accept funds through.
         JBTerminalConfig[] memory terminalConfigurations = new JBTerminalConfig[](2);
-        terminalConfigurations[0] =
-            JBTerminalConfig({terminal: core.terminal, tokensToAccept: tokensToAccept});
+        terminalConfigurations[0] = JBTerminalConfig({terminal: core.terminal, tokensToAccept: tokensToAccept});
         terminalConfigurations[1] =
-            JBTerminalConfig({terminal: swapTerminal.swap_terminal, tokensToAccept: new address[](0)});   
-        
+            JBTerminalConfig({terminal: swapTerminal.swap_terminal, tokensToAccept: new address[](0)});
+
         REVMintConfig[] memory mintConfs = new REVMintConfig[](1);
-        mintConfs[0] = REVMintConfig({
-            chainId: 11155111,
-            count: 37_000_000 * decimalMultiplier,
-            beneficiary: OPERATOR 
-        });
-            
+        mintConfs[0] =
+            REVMintConfig({chainId: 11_155_111, count: 37_000_000 * decimalMultiplier, beneficiary: OPERATOR});
+
         // The project's revnet stage configurations.
         REVStageConfig[] memory stageConfigurations = new REVStageConfig[](1);
         stageConfigurations[0] = REVStageConfig({
-            mintConfigs: mintConfs, 
-            startsAtOrAfter: start,
+            mintConfigs: mintConfs,
+            startsAtOrAfter: uint40(block.timestamp + TIME_UNTIL_START),
             splitRate: uint16(JBConstants.MAX_RESERVED_RATE / 5), // 20%
             initialIssuanceRate: uint112(1000 * decimalMultiplier),
-            priceCeilingIncreaseFrequency: 7 * oneDay,
+            priceCeilingIncreaseFrequency: 7 days,
             priceCeilingIncreasePercentage: uint32(JBConstants.MAX_DECAY_RATE / 100), // 1%
             priceFloorTaxIntensity: uint16(JBConstants.MAX_REDEMPTION_RATE / 3) // 0.3
         });
@@ -176,10 +180,8 @@ contract DeployScript is Script, Sphinx {
             twapWindow: 2 days,
             twapSlippageTolerance: 9000
         });
-        REVBuybackHookConfig memory buybackHookConfiguration = REVBuybackHookConfig({
-            hook: buybackHook.hook,
-            poolConfigurations: buybackPoolConfigurations
-        });
+        REVBuybackHookConfig memory buybackHookConfiguration =
+            REVBuybackHookConfig({hook: buybackHook.hook, poolConfigurations: buybackPoolConfigurations});
 
         // The project's allowed croptop posts.
         REVCroptopAllowedPost[] memory allowedPosts = new REVCroptopAllowedPost[](6);
@@ -235,19 +237,15 @@ contract DeployScript is Script, Sphinx {
             minBridgeAmount: 0.01 ether
         });
 
-        BPSuckerDeployerConfig[] memory suckerDeployerConfigurations; 
-        if (block.chainid == 1 || block.chainid == 11155111) {
+        BPSuckerDeployerConfig[] memory suckerDeployerConfigurations;
+        if (block.chainid == 1 || block.chainid == 11_155_111) {
             suckerDeployerConfigurations = new BPSuckerDeployerConfig[](2);
-            // OP 
-            suckerDeployerConfigurations[0] = BPSuckerDeployerConfig({
-                deployer: suckers.optimismDeployer,
-                mappings: tokenMappings
-            });
+            // OP
+            suckerDeployerConfigurations[0] =
+                BPSuckerDeployerConfig({deployer: suckers.optimismDeployer, mappings: tokenMappings});
 
-            suckerDeployerConfigurations[1] = BPSuckerDeployerConfig({
-                deployer: suckers.baseDeployer,
-                mappings: tokenMappings
-            });
+            suckerDeployerConfigurations[1] =
+                BPSuckerDeployerConfig({deployer: suckers.baseDeployer, mappings: tokenMappings});
 
             // suckerDeployerConfigurations[2] = BPSuckerDeployerConfig({
             //     deployer: suckers.arbitrumDeployer,
@@ -255,15 +253,19 @@ contract DeployScript is Script, Sphinx {
             // });
         } else {
             suckerDeployerConfigurations = new BPSuckerDeployerConfig[](1);
-            // L2 -> Mainnet 
+            // L2 -> Mainnet
             suckerDeployerConfigurations[0] = BPSuckerDeployerConfig({
-                deployer: address(suckers.optimismDeployer) != address(0) ? suckers.optimismDeployer : address(suckers.baseDeployer) != address(0) ? suckers.baseDeployer : suckers.arbitrumDeployer,
+                deployer: address(suckers.optimismDeployer) != address(0)
+                    ? suckers.optimismDeployer
+                    : address(suckers.baseDeployer) != address(0) ? suckers.baseDeployer : suckers.arbitrumDeployer,
                 mappings: tokenMappings
             });
 
-            if(address(suckerDeployerConfigurations[0].deployer) == address(0)) revert("L2 > L1 Sucker is not configured");
+            if (address(suckerDeployerConfigurations[0].deployer) == address(0)) {
+                revert("L2 > L1 Sucker is not configured");
+            }
         }
-        
+
         // Specify all sucker deployments.
         REVSuckerDeploymentConfig memory suckerDeploymentConfiguration =
             REVSuckerDeploymentConfig({deployerConfigurations: suckerDeployerConfigurations, salt: SUCKER_SALT});
@@ -305,31 +307,30 @@ contract DeployScript is Script, Sphinx {
         });
     }
 
-     function deploy() public sphinx {
+    function deploy() public sphinx {
         // The permissions required to configure a revnet.
-        uint256[] memory _permissions = new uint256[](6);
+        uint256[] memory _permissions = new uint256[](7);
         _permissions[0] = JBPermissionIds.QUEUE_RULESETS;
         _permissions[1] = JBPermissionIds.SET_TERMINALS;
         _permissions[2] = JBPermissionIds.DEPLOY_ERC20;
         _permissions[3] = JBPermissionIds.SET_BUYBACK_POOL;
-        _permissions[4] = JBPermissionIds.SET_SPLIT_GROUPS; 
-        _permissions[5] = JBPermissionIds.DEPLOY_SUCKERS; 
+        _permissions[4] = JBPermissionIds.SET_SPLIT_GROUPS;
+        _permissions[5] = JBPermissionIds.DEPLOY_SUCKERS;
+        _permissions[6] = JBPermissionIds.MINT_TOKENS;
 
-       // Give the permissions to the croptop deployer.
-        core.permissions.setPermissionsFor(safeAddress(), JBPermissionsData({
-            operator: address(revnet.croptop_deployer),
-            projectId: 1,
-            permissionIds: _permissions
-        }));
+        // Give the permissions to the croptop deployer.
+        core.permissions.setPermissionsFor(
+            safeAddress(),
+            JBPermissionsData({operator: address(revnet.croptop_deployer), projectId: 1, permissionIds: _permissions})
+        );
 
         // Give the permissions to the sucker registry.
         uint256[] memory _registryPermissions = new uint256[](1);
-        _registryPermissions[0] = JBPermissionIds.MAP_SUCKER_TOKEN; 
-        core.permissions.setPermissionsFor(safeAddress(), JBPermissionsData({
-            operator: address(suckers.registry),
-            projectId: 1,
-            permissionIds: _registryPermissions
-        }));
+        _registryPermissions[0] = JBPermissionIds.MAP_SUCKER_TOKEN;
+        core.permissions.setPermissionsFor(
+            safeAddress(),
+            JBPermissionsData({operator: address(suckers.registry), projectId: 1, permissionIds: _registryPermissions})
+        );
 
         // Deploy the NANA fee project.
         revnet.croptop_deployer.launchCroptopRevnetFor({
