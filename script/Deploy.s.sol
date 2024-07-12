@@ -153,7 +153,7 @@ contract DeployScript is Script, Sphinx {
         // The project's revnet configuration
         REVConfig memory revnetConfiguration = REVConfig({
             description: REVDescription(name, symbol, projectUri, ERC20_SALT),
-            baseCurrency: nativeCurrency,
+            baseCurrency: JBConstants.NATIVE_TOKEN,
             initialSplitOperator: OPERATOR,
             stageConfigurations: stageConfigurations
         });
