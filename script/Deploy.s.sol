@@ -4,7 +4,6 @@ pragma solidity 0.8.23;
 import "@bananapus/core/script/helpers/CoreDeploymentLib.sol";
 import "@bananapus/721-hook/script/helpers/Hook721DeploymentLib.sol";
 import "@bananapus/suckers/script/helpers/SuckerDeploymentLib.sol";
-import "@croptop/core/script/helpers/CroptopDeploymentLib.sol";
 import "@rev-net/core/script/helpers/RevnetCoreDeploymentLib.sol";
 import "@bananapus/buyback-hook/script/helpers/BuybackDeploymentLib.sol";
 import "@bananapus/swap-terminal/script/helpers/SwapTerminalDeploymentLib.sol";
@@ -15,7 +14,6 @@ import {JBConstants} from "@bananapus/core/src/libraries/JBConstants.sol";
 import {JBTerminalConfig} from "@bananapus/core/src/structs/JBTerminalConfig.sol";
 import {REVStageConfig, REVMintConfig} from "@rev-net/core/src/structs/REVStageConfig.sol";
 import {REVConfig} from "@rev-net/core/src/structs/REVConfig.sol";
-import {REVCroptopAllowedPost} from "@rev-net/core/src/structs/REVCroptopAllowedPost.sol";
 import {REVBuybackPoolConfig} from "@rev-net/core/src/structs/REVBuybackPoolConfig.sol";
 import {REVBuybackHookConfig} from "@rev-net/core/src/structs/REVBuybackHookConfig.sol";
 import {JB721TierConfig} from "@bananapus/721-hook/src/structs/JB721TierConfig.sol";
@@ -39,10 +37,6 @@ struct FeeProjectConfig {
     JBTerminalConfig[] terminalConfigurations;
     REVBuybackHookConfig buybackHookConfiguration;
     REVSuckerDeploymentConfig suckerDeploymentConfiguration;
-    REVDeploy721TiersHookConfig hookConfiguration;
-    JBPayHookSpecification[] otherPayHooksSpecifications;
-    uint16 extraHookMetadata;
-    REVCroptopAllowedPost[] allowedPosts;
 }
 
 contract DeployScript is Script, Sphinx {
@@ -50,8 +44,6 @@ contract DeployScript is Script, Sphinx {
     CoreDeployment core;
     /// @notice tracks the deployment of the sucker contracts for the chain we are deploying to.
     SuckerDeployment suckers;
-    /// @notice tracks the deployment of the croptop contracts for the chain we are deploying to.
-    CroptopDeployment croptop;
     /// @notice tracks the deployment of the revnet contracts for the chain we are deploying to.
     RevnetCoreDeployment revnet;
     /// @notice tracks the deployment of the 721 hook contracts for the chain we are deploying to.
@@ -84,10 +76,6 @@ contract DeployScript is Script, Sphinx {
         // Get the deployment addresses for the suckers contracts for this chain.
         suckers = SuckerDeploymentLib.getDeployment(
             vm.envOr("NANA_SUCKERS_DEPLOYMENT_PATH", string("node_modules/@bananapus/suckers/deployments/"))
-        );
-        // Get the deployment addresses for the 721 hook contracts for this chain.
-        croptop = CroptopDeploymentLib.getDeployment(
-            vm.envOr("CROPTOP_CORE_DEPLOYMENT_PATH", string("node_modules/@croptop/core/deployments/"))
         );
         // Get the deployment addresses for the 721 hook contracts for this chain.
         revnet = RevnetCoreDeploymentLib.getDeployment(
@@ -130,9 +118,7 @@ contract DeployScript is Script, Sphinx {
         string memory name = "Bananapus";
         string memory symbol = "$NANA";
         string memory projectUri = "ipfs://QmareAjTrXVLNyUhipU2iYpWCHYqzeHYvZ1TaK9HtswvcW";
-        string memory baseUri = "ipfs://";
         string memory contractUri = "";
-        uint32 nativeCurrency = uint32(uint160(JBConstants.NATIVE_TOKEN));
         uint8 decimals = 18;
         uint256 decimalMultiplier = 10 ** decimals;
 
@@ -183,51 +169,6 @@ contract DeployScript is Script, Sphinx {
         REVBuybackHookConfig memory buybackHookConfiguration =
             REVBuybackHookConfig({hook: buybackHook.hook, poolConfigurations: buybackPoolConfigurations});
 
-        // The project's allowed croptop posts.
-        REVCroptopAllowedPost[] memory allowedPosts = new REVCroptopAllowedPost[](6);
-        allowedPosts[0] = REVCroptopAllowedPost({
-            category: 0,
-            minimumPrice: 10 ** (decimals - 5),
-            minimumTotalSupply: 100_000,
-            maximumTotalSupply: 999_999_999,
-            allowedAddresses: new address[](0)
-        });
-        allowedPosts[1] = REVCroptopAllowedPost({
-            category: 1,
-            minimumPrice: 10 ** (decimals - 4),
-            minimumTotalSupply: 100_000,
-            maximumTotalSupply: 999_999_999,
-            allowedAddresses: new address[](0)
-        });
-        allowedPosts[2] = REVCroptopAllowedPost({
-            category: 2,
-            minimumPrice: 10 ** (decimals - 3),
-            minimumTotalSupply: 10_000,
-            maximumTotalSupply: 999_999_999,
-            allowedAddresses: new address[](0)
-        });
-        allowedPosts[3] = REVCroptopAllowedPost({
-            category: 3,
-            minimumPrice: 10 ** (decimals - 1),
-            minimumTotalSupply: 100,
-            maximumTotalSupply: 999_999_999,
-            allowedAddresses: new address[](0)
-        });
-        allowedPosts[4] = REVCroptopAllowedPost({
-            category: 4,
-            minimumPrice: 10 ** decimals,
-            minimumTotalSupply: 10,
-            maximumTotalSupply: 999_999_999,
-            allowedAddresses: new address[](0)
-        });
-        allowedPosts[5] = REVCroptopAllowedPost({
-            category: 5,
-            minimumPrice: 10 ** (decimals + 2),
-            minimumTotalSupply: 7,
-            maximumTotalSupply: 999_999_999,
-            allowedAddresses: new address[](0)
-        });
-
         // Organize the instructions for how this project will connect to other chains.
         BPTokenMapping[] memory tokenMappings = new BPTokenMapping[](1);
         tokenMappings[0] = BPTokenMapping({
@@ -274,36 +215,7 @@ contract DeployScript is Script, Sphinx {
             configuration: revnetConfiguration,
             terminalConfigurations: terminalConfigurations,
             buybackHookConfiguration: buybackHookConfiguration,
-            suckerDeploymentConfiguration: suckerDeploymentConfiguration,
-            hookConfiguration: REVDeploy721TiersHookConfig({
-                baseline721HookConfiguration: JBDeploy721TiersHookConfig({
-                    name: name,
-                    symbol: symbol,
-                    rulesets: core.rulesets,
-                    baseUri: baseUri,
-                    tokenUriResolver: IJB721TokenUriResolver(address(0)),
-                    contractUri: contractUri,
-                    tiersConfig: JB721InitTiersConfig({
-                        tiers: new JB721TierConfig[](0),
-                        currency: nativeCurrency,
-                        decimals: decimals,
-                        prices: IJBPrices(address(0))
-                    }),
-                    reserveBeneficiary: address(0),
-                    flags: JB721TiersHookFlags({
-                        noNewTiersWithReserves: false,
-                        noNewTiersWithVotes: false,
-                        noNewTiersWithOwnerMinting: false,
-                        preventOverspending: false
-                    })
-                }),
-                operatorCanAdjustTiers: true,
-                operatorCanUpdateMetadata: true,
-                operatorCanMint: true
-            }),
-            otherPayHooksSpecifications: new JBPayHookSpecification[](0),
-            extraHookMetadata: 0,
-            allowedPosts: allowedPosts
+            suckerDeploymentConfiguration: suckerDeploymentConfiguration
         });
     }
 
@@ -318,12 +230,6 @@ contract DeployScript is Script, Sphinx {
         _permissions[5] = JBPermissionIds.DEPLOY_SUCKERS;
         _permissions[6] = JBPermissionIds.MINT_TOKENS;
 
-        // Give the permissions to the croptop deployer.
-        core.permissions.setPermissionsFor(
-            safeAddress(),
-            JBPermissionsData({operator: address(revnet.croptop_deployer), projectId: 1, permissionIds: _permissions})
-        );
-
         // Give the permissions to the sucker registry.
         uint256[] memory _registryPermissions = new uint256[](1);
         _registryPermissions[0] = JBPermissionIds.MAP_SUCKER_TOKEN;
@@ -333,19 +239,15 @@ contract DeployScript is Script, Sphinx {
         );
 
         // Deploy the NANA fee project.
-        revnet.croptop_deployer.launchCroptopRevnetFor({
+        revnet.basic_deployer.launchRevnetFor({
             revnetId: 1,
             configuration: feeProjectConfig.configuration,
             terminalConfigurations: feeProjectConfig.terminalConfigurations,
             buybackHookConfiguration: feeProjectConfig.buybackHookConfiguration,
-            suckerDeploymentConfiguration: feeProjectConfig.suckerDeploymentConfiguration,
-            hookConfiguration: feeProjectConfig.hookConfiguration,
-            otherPayHooksSpecifications: feeProjectConfig.otherPayHooksSpecifications,
-            extraHookMetadata: feeProjectConfig.extraHookMetadata,
-            allowedPosts: feeProjectConfig.allowedPosts
+            suckerDeploymentConfiguration: feeProjectConfig.suckerDeploymentConfiguration
         });
 
         // Tranfer ownership.
-        core.projects.transferFrom(safeAddress(), address(revnet.croptop_deployer), 1);
+        core.projects.transferFrom(safeAddress(), address(revnet.basic_deployer), 1);
     }
 }
