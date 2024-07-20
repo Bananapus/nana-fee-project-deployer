@@ -11,14 +11,15 @@ import "@bananapus/swap-terminal/script/helpers/SwapTerminalDeploymentLib.sol";
 import {JBPermissionIds} from "@bananapus/permission-ids/src/JBPermissionIds.sol";
 import {JBPermissionsData} from "@bananapus/core/src/structs/JBPermissionsData.sol";
 import {JBConstants} from "@bananapus/core/src/libraries/JBConstants.sol";
+import {JBAccountingContext} from "@bananapus/core/src/structs/JBAccountingContext.sol";
 import {JBTerminalConfig} from "@bananapus/core/src/structs/JBTerminalConfig.sol";
 import {REVStageConfig, REVMintConfig} from "@rev-net/core/src/structs/REVStageConfig.sol";
 import {REVConfig} from "@rev-net/core/src/structs/REVConfig.sol";
 import {REVBuybackPoolConfig} from "@rev-net/core/src/structs/REVBuybackPoolConfig.sol";
 import {REVBuybackHookConfig} from "@rev-net/core/src/structs/REVBuybackHookConfig.sol";
 import {JB721TierConfig} from "@bananapus/721-hook/src/structs/JB721TierConfig.sol";
-import {BPTokenMapping} from "@bananapus/suckers/src/structs/BPTokenMapping.sol";
-import {BPSuckerDeployerConfig} from "@bananapus/suckers/src/structs/BPSuckerDeployerConfig.sol";
+import {JBTokenMapping} from "@bananapus/suckers/src/structs/JBTokenMapping.sol";
+import {JBSuckerDeployerConfig} from "@bananapus/suckers/src/structs/JBSuckerDeployerConfig.sol";
 import {REVSuckerDeploymentConfig} from "@rev-net/core/src/structs/REVSuckerDeploymentConfig.sol";
 import {JBPayHookSpecification} from "@bananapus/core/src/structs/JBPayHookSpecification.sol";
 import {JB721InitTiersConfig} from "@bananapus/721-hook/src/structs/JB721InitTiersConfig.sol";
@@ -118,43 +119,52 @@ contract DeployScript is Script, Sphinx {
         string memory name = "Bananapus";
         string memory symbol = "$NANA";
         string memory projectUri = "ipfs://QmareAjTrXVLNyUhipU2iYpWCHYqzeHYvZ1TaK9HtswvcW";
-        string memory contractUri = "";
         uint8 decimals = 18;
         uint256 decimalMultiplier = 10 ** decimals;
 
         // The tokens that the project accepts and stores.
-        address[] memory tokensToAccept = new address[](1);
+        JBAccountingContext[] memory accountingContextsToAccept = new JBAccountingContext[](1);
 
         // Accept the chain's native currency through the multi terminal.
-        tokensToAccept[0] = JBConstants.NATIVE_TOKEN;
+        accountingContextsToAccept[0] = JBAccountingContext({
+            token: JBConstants.NATIVE_TOKEN,
+            decimals: 18,
+            currency: uint32(uint160(JBConstants.NATIVE_TOKEN))
+        });
 
         // The terminals that the project will accept funds through.
         JBTerminalConfig[] memory terminalConfigurations = new JBTerminalConfig[](2);
-        terminalConfigurations[0] = JBTerminalConfig({terminal: core.terminal, tokensToAccept: tokensToAccept});
-        terminalConfigurations[1] =
-            JBTerminalConfig({terminal: swapTerminal.swap_terminal, tokensToAccept: new address[](0)});
+        terminalConfigurations[0] =
+            JBTerminalConfig({terminal: core.terminal, accountingContextsToAccept: accountingContextsToAccept});
+        terminalConfigurations[1] = JBTerminalConfig({
+            terminal: swapTerminal.swap_terminal,
+            accountingContextsToAccept: new JBAccountingContext[](0)
+        });
 
         REVMintConfig[] memory mintConfs = new REVMintConfig[](1);
-        mintConfs[0] =
-            REVMintConfig({chainId: 11_155_111, count: 37_000_000 * decimalMultiplier, beneficiary: OPERATOR});
+        mintConfs[0] = REVMintConfig({
+            chainId: uint32(11_155_111),
+            count: uint104(37_000_000 * decimalMultiplier),
+            beneficiary: OPERATOR
+        });
 
         // The project's revnet stage configurations.
         REVStageConfig[] memory stageConfigurations = new REVStageConfig[](1);
         stageConfigurations[0] = REVStageConfig({
             mintConfigs: mintConfs,
             startsAtOrAfter: uint40(block.timestamp + TIME_UNTIL_START),
-            splitRate: uint16(JBConstants.MAX_RESERVED_RATE / 5), // 20%
-            initialIssuanceRate: uint112(1000 * decimalMultiplier),
-            priceCeilingIncreaseFrequency: 7 days,
-            priceCeilingIncreasePercentage: uint32(JBConstants.MAX_DECAY_RATE / 100), // 1%
-            priceFloorTaxIntensity: uint16(JBConstants.MAX_REDEMPTION_RATE / 3) // 0.3
+            splitPercent: uint16(JBConstants.MAX_RESERVED_RATE / 5), // 20%
+            initialPrice: uint104(10 ** (decimals - 2)),
+            priceIncreaseFrequency: 7 days,
+            priceIncreasePercentage: uint32(JBConstants.MAX_DECAY_RATE / 100), // 1%
+            cashOutTaxIntensity: uint16(JBConstants.MAX_REDEMPTION_RATE / 3) // 0.3
         });
 
         // The project's revnet configuration
         REVConfig memory revnetConfiguration = REVConfig({
             description: REVDescription(name, symbol, projectUri, ERC20_SALT),
-            baseCurrency: JBConstants.NATIVE_TOKEN,
-            initialSplitOperator: OPERATOR,
+            baseCurrency: uint32(uint160(JBConstants.NATIVE_TOKEN)),
+            splitOperator: OPERATOR,
             stageConfigurations: stageConfigurations
         });
 
@@ -170,32 +180,30 @@ contract DeployScript is Script, Sphinx {
             REVBuybackHookConfig({hook: buybackHook.hook, poolConfigurations: buybackPoolConfigurations});
 
         // Organize the instructions for how this project will connect to other chains.
-        BPTokenMapping[] memory tokenMappings = new BPTokenMapping[](1);
-        tokenMappings[0] = BPTokenMapping({
+        JBTokenMapping[] memory tokenMappings = new JBTokenMapping[](1);
+        tokenMappings[0] = JBTokenMapping({
             localToken: JBConstants.NATIVE_TOKEN,
             remoteToken: JBConstants.NATIVE_TOKEN,
             minGas: 200_000,
             minBridgeAmount: 0.01 ether
         });
 
-        BPSuckerDeployerConfig[] memory suckerDeployerConfigurations;
+        JBSuckerDeployerConfig[] memory suckerDeployerConfigurations;
         if (block.chainid == 1 || block.chainid == 11_155_111) {
-            suckerDeployerConfigurations = new BPSuckerDeployerConfig[](2);
+            suckerDeployerConfigurations = new JBSuckerDeployerConfig[](3);
             // OP
             suckerDeployerConfigurations[0] =
-                BPSuckerDeployerConfig({deployer: suckers.optimismDeployer, mappings: tokenMappings});
+                JBSuckerDeployerConfig({deployer: suckers.optimismDeployer, mappings: tokenMappings});
 
             suckerDeployerConfigurations[1] =
-                BPSuckerDeployerConfig({deployer: suckers.baseDeployer, mappings: tokenMappings});
+                JBSuckerDeployerConfig({deployer: suckers.baseDeployer, mappings: tokenMappings});
 
-            // suckerDeployerConfigurations[2] = BPSuckerDeployerConfig({
-            //     deployer: suckers.arbitrumDeployer,
-            //     mappings: tokenMappings
-            // });
+            suckerDeployerConfigurations[2] =
+                JBSuckerDeployerConfig({deployer: suckers.arbitrumDeployer, mappings: tokenMappings});
         } else {
-            suckerDeployerConfigurations = new BPSuckerDeployerConfig[](1);
+            suckerDeployerConfigurations = new JBSuckerDeployerConfig[](1);
             // L2 -> Mainnet
-            suckerDeployerConfigurations[0] = BPSuckerDeployerConfig({
+            suckerDeployerConfigurations[0] = JBSuckerDeployerConfig({
                 deployer: address(suckers.optimismDeployer) != address(0)
                     ? suckers.optimismDeployer
                     : address(suckers.baseDeployer) != address(0) ? suckers.baseDeployer : suckers.arbitrumDeployer,
@@ -220,6 +228,9 @@ contract DeployScript is Script, Sphinx {
     }
 
     function deploy() public sphinx {
+
+        // TODO replace this permission stuff with setting the revnet deployer as the 721 operator.
+
         // The permissions required to configure a revnet.
         uint256[] memory _permissions = new uint256[](7);
         _permissions[0] = JBPermissionIds.QUEUE_RULESETS;
@@ -231,7 +242,7 @@ contract DeployScript is Script, Sphinx {
         _permissions[6] = JBPermissionIds.MINT_TOKENS;
 
         // Give the permissions to the sucker registry.
-        uint256[] memory _registryPermissions = new uint256[](1);
+        uint8[] memory _registryPermissions = new uint8[](1);
         _registryPermissions[0] = JBPermissionIds.MAP_SUCKER_TOKEN;
         core.permissions.setPermissionsFor(
             safeAddress(),
@@ -239,7 +250,7 @@ contract DeployScript is Script, Sphinx {
         );
 
         // Deploy the NANA fee project.
-        revnet.basic_deployer.launchRevnetFor({
+        revnet.basic_deployer.deployFor({
             revnetId: 1,
             configuration: feeProjectConfig.configuration,
             terminalConfigurations: feeProjectConfig.terminalConfigurations,
