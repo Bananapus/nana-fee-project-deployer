@@ -15,12 +15,12 @@
         "artifacts": "source ./.env && npx sphinx artifacts --org-id 'cltepuu9u0003j58rjtbd0hvu' --project-name 'nana-fee-project'"
     },
     "dependencies": {
-        "@bananapus/buyback-hook": "^0.0.15",
-        "@bananapus/core": "^0.0.22",
+        "@bananapus/buyback-hook": "^0.0.16",
+        "@bananapus/core": "^0.0.24",
         "@bananapus/ownable": "^0.0.6",
-        "@bananapus/suckers": "^0.0.17",
-        "@bananapus/swap-terminal": "^0.0.15",
-        "@rev-net/core": "^0.0.28",
+        "@bananapus/suckers": "^0.0.19",
+        "@bananapus/swap-terminal": "^0.0.16",
+        "@rev-net/core": "^0.0.31",
         "@openzeppelin/contracts": "^5.0.2"
     },
     "devDependencies": {

@@ -153,11 +153,11 @@ contract DeployScript is Script, Sphinx {
         stageConfigurations[0] = REVStageConfig({
             mintConfigs: mintConfs,
             startsAtOrAfter: uint40(block.timestamp + TIME_UNTIL_START),
-            splitPercent: uint16(JBConstants.MAX_RESERVED_RATE / 5), // 20%
-            initialPrice: uint104(10 ** (decimals - 2)),
-            priceIncreaseFrequency: 7 days,
-            priceIncreasePercentage: uint32(JBConstants.MAX_DECAY_RATE / 100), // 1%
-            cashOutTaxIntensity: uint16(JBConstants.MAX_REDEMPTION_RATE / 3) // 0.3
+            splitPercent: uint16(JBConstants.MAX_RESERVED_PERCENT / 5), // 20%
+            initialIssuance: uint112(1000 * decimalMultiplier),
+            issuanceDecayFrequency: 30 days,
+            issuanceDecayPercent: 25_000_000, // 2.5%
+            cashOutTaxRate: 3000 // 0.3
         });
 
         // The project's revnet configuration
