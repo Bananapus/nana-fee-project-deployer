@@ -13,7 +13,9 @@ import {JBPermissionsData} from "@bananapus/core/src/structs/JBPermissionsData.s
 import {JBConstants} from "@bananapus/core/src/libraries/JBConstants.sol";
 import {JBAccountingContext} from "@bananapus/core/src/structs/JBAccountingContext.sol";
 import {JBTerminalConfig} from "@bananapus/core/src/structs/JBTerminalConfig.sol";
-import {REVStageConfig, REVMintConfig} from "@rev-net/core/src/structs/REVStageConfig.sol";
+import {REVStageConfig} from "@rev-net/core/src/structs/REVStageConfig.sol";
+import {REVLoanSource} from "@rev-net/core/src/structs/REVLoanSource.sol";
+import {REVAutoMint} from "@rev-net/core/src/structs/REVAutoMint.sol";
 import {REVConfig} from "@rev-net/core/src/structs/REVConfig.sol";
 import {REVBuybackPoolConfig} from "@rev-net/core/src/structs/REVBuybackPoolConfig.sol";
 import {REVBuybackHookConfig} from "@rev-net/core/src/structs/REVBuybackHookConfig.sol";
@@ -142,8 +144,8 @@ contract DeployScript is Script, Sphinx {
             accountingContextsToAccept: new JBAccountingContext[](0)
         });
 
-        REVMintConfig[] memory mintConfs = new REVMintConfig[](1);
-        mintConfs[0] = REVMintConfig({
+        REVAutoMint[] memory mintConfs = new REVAutoMint[](1);
+        mintConfs[0] = REVAutoMint({
             chainId: uint32(premintChainId),
             count: uint104(37_000_000 * decimalMultiplier),
             beneficiary: OPERATOR
@@ -152,13 +154,14 @@ contract DeployScript is Script, Sphinx {
         // The project's revnet stage configurations.
         REVStageConfig[] memory stageConfigurations = new REVStageConfig[](1);
         stageConfigurations[0] = REVStageConfig({
-            mintConfigs: mintConfs,
+            autoMints: mintConfs,
             startsAtOrAfter: uint40(block.timestamp + TIME_UNTIL_START),
             splitPercent: uint16(JBConstants.MAX_RESERVED_PERCENT / 2), // 50%
             initialIssuance: uint112(1000 * decimalMultiplier),
             issuanceDecayFrequency: 180 days,
             issuanceDecayPercent: 300_000_000, // 30%
-            cashOutTaxRate: 3000 // 0.3
+            cashOutTaxRate: 3000, // 0.3
+            extraMetadata: 0
         });
 
         // The project's revnet configuration
@@ -166,7 +169,10 @@ contract DeployScript is Script, Sphinx {
             description: REVDescription(name, symbol, projectUri, ERC20_SALT),
             baseCurrency: uint32(uint160(JBConstants.NATIVE_TOKEN)),
             splitOperator: OPERATOR,
-            stageConfigurations: stageConfigurations
+            stageConfigurations: stageConfigurations,
+            loanSources: new REVLoanSource[](0),
+            loans: address(0),
+            allowCrosschainSuckerExtension: true
         });
 
         // The project's buyback hook configuration.

@@ -16,11 +16,11 @@
     },
     "dependencies": {
         "@bananapus/buyback-hook": "^0.0.16",
-        "@bananapus/core": "^0.0.24",
+        "@bananapus/core": "^0.0.30",
         "@bananapus/ownable": "^0.0.6",
         "@bananapus/suckers": "^0.0.19",
         "@bananapus/swap-terminal": "^0.0.16",
-        "@rev-net/core": "^0.0.31",
+        "@rev-net/core": "^0.0.33",
         "@openzeppelin/contracts": "^5.0.2"
     },
     "devDependencies": {
