@@ -121,6 +121,7 @@ contract DeployScript is Script, Sphinx {
         string memory projectUri = "ipfs://QmareAjTrXVLNyUhipU2iYpWCHYqzeHYvZ1TaK9HtswvcW";
         uint8 decimals = 18;
         uint256 decimalMultiplier = 10 ** decimals;
+        uint256 premintChainId = 11_155_111;
 
         // The tokens that the project accepts and stores.
         JBAccountingContext[] memory accountingContextsToAccept = new JBAccountingContext[](1);
@@ -143,7 +144,7 @@ contract DeployScript is Script, Sphinx {
 
         REVMintConfig[] memory mintConfs = new REVMintConfig[](1);
         mintConfs[0] = REVMintConfig({
-            chainId: uint32(11_155_111),
+            chainId: uint32(premintChainId),
             count: uint104(37_000_000 * decimalMultiplier),
             beneficiary: OPERATOR
         });
@@ -153,10 +154,10 @@ contract DeployScript is Script, Sphinx {
         stageConfigurations[0] = REVStageConfig({
             mintConfigs: mintConfs,
             startsAtOrAfter: uint40(block.timestamp + TIME_UNTIL_START),
-            splitPercent: uint16(JBConstants.MAX_RESERVED_PERCENT / 5), // 20%
+            splitPercent: uint16(JBConstants.MAX_RESERVED_PERCENT / 2), // 50%
             initialIssuance: uint112(1000 * decimalMultiplier),
-            issuanceDecayFrequency: 30 days,
-            issuanceDecayPercent: 25_000_000, // 2.5%
+            issuanceDecayFrequency: 180 days,
+            issuanceDecayPercent: 300_000_000, // 30%
             cashOutTaxRate: 3000 // 0.3
         });
 
@@ -228,37 +229,18 @@ contract DeployScript is Script, Sphinx {
     }
 
     function deploy() public sphinx {
+        uint256 FEE_PROJECT_ID = 1;
 
-        // TODO replace this permission stuff with setting the revnet deployer as the 721 operator.
-
-        // The permissions required to configure a revnet.
-        uint256[] memory _permissions = new uint256[](7);
-        _permissions[0] = JBPermissionIds.QUEUE_RULESETS;
-        _permissions[1] = JBPermissionIds.SET_TERMINALS;
-        _permissions[2] = JBPermissionIds.DEPLOY_ERC20;
-        _permissions[3] = JBPermissionIds.SET_BUYBACK_POOL;
-        _permissions[4] = JBPermissionIds.SET_SPLIT_GROUPS;
-        _permissions[5] = JBPermissionIds.DEPLOY_SUCKERS;
-        _permissions[6] = JBPermissionIds.MINT_TOKENS;
-
-        // Give the permissions to the sucker registry.
-        uint8[] memory _registryPermissions = new uint8[](1);
-        _registryPermissions[0] = JBPermissionIds.MAP_SUCKER_TOKEN;
-        core.permissions.setPermissionsFor(
-            safeAddress(),
-            JBPermissionsData({operator: address(suckers.registry), projectId: 1, permissionIds: _registryPermissions})
-        );
+        // Approve the basic deployer to configure the project.
+        core.projects.approve(address(revnet.basic_deployer), FEE_PROJECT_ID);
 
         // Deploy the NANA fee project.
         revnet.basic_deployer.deployFor({
-            revnetId: 1,
+            revnetId: FEE_PROJECT_ID,
             configuration: feeProjectConfig.configuration,
             terminalConfigurations: feeProjectConfig.terminalConfigurations,
             buybackHookConfiguration: feeProjectConfig.buybackHookConfiguration,
             suckerDeploymentConfiguration: feeProjectConfig.suckerDeploymentConfiguration
         });
-
-        // Tranfer ownership.
-        core.projects.transferFrom(safeAddress(), address(revnet.basic_deployer), 1);
     }
 }
