@@ -12,7 +12,7 @@
     "scripts": {
         "deploy:mainnets": "source ./.env && export START_TIME=$(date +%s) && npx sphinx propose ./script/Deploy.s.sol --networks mainnets",
         "deploy:testnets": "source ./.env && export START_TIME=$(date +%s) && npx sphinx propose ./script/Deploy.s.sol --networks testnets",
-        "artifacts": "source ./.env && npx sphinx artifacts --org-id 'cltepuu9u0003j58rjtbd0hvu' --project-name 'nana-fee-project'"
+        "artifacts": "source ./.env && npx sphinx artifacts --org-id 'my-org-id' --project-name 'nana-fee-project'"
     },
     "dependencies": {
         "@bananapus/buyback-hook": "^0.0.16",

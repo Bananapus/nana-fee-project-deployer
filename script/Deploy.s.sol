@@ -235,6 +235,7 @@ contract DeployScript is Script, Sphinx {
     }
 
     function deploy() public sphinx {
+
         uint256 FEE_PROJECT_ID = 1;
 
         // Approve the basic deployer to configure the project.
