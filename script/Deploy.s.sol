@@ -13,7 +13,9 @@ import {JBPermissionsData} from "@bananapus/core/src/structs/JBPermissionsData.s
 import {JBConstants} from "@bananapus/core/src/libraries/JBConstants.sol";
 import {JBAccountingContext} from "@bananapus/core/src/structs/JBAccountingContext.sol";
 import {JBTerminalConfig} from "@bananapus/core/src/structs/JBTerminalConfig.sol";
-import {REVStageConfig, REVMintConfig} from "@rev-net/core/src/structs/REVStageConfig.sol";
+import {REVStageConfig} from "@rev-net/core/src/structs/REVStageConfig.sol";
+import {REVLoanSource} from "@rev-net/core/src/structs/REVLoanSource.sol";
+import {REVAutoMint} from "@rev-net/core/src/structs/REVAutoMint.sol";
 import {REVConfig} from "@rev-net/core/src/structs/REVConfig.sol";
 import {REVBuybackPoolConfig} from "@rev-net/core/src/structs/REVBuybackPoolConfig.sol";
 import {REVBuybackHookConfig} from "@rev-net/core/src/structs/REVBuybackHookConfig.sol";
@@ -121,6 +123,7 @@ contract DeployScript is Script, Sphinx {
         string memory projectUri = "ipfs://QmareAjTrXVLNyUhipU2iYpWCHYqzeHYvZ1TaK9HtswvcW";
         uint8 decimals = 18;
         uint256 decimalMultiplier = 10 ** decimals;
+        uint256 premintChainId = 11_155_111;
 
         // The tokens that the project accepts and stores.
         JBAccountingContext[] memory accountingContextsToAccept = new JBAccountingContext[](1);
@@ -141,9 +144,9 @@ contract DeployScript is Script, Sphinx {
             accountingContextsToAccept: new JBAccountingContext[](0)
         });
 
-        REVMintConfig[] memory mintConfs = new REVMintConfig[](1);
-        mintConfs[0] = REVMintConfig({
-            chainId: uint32(11_155_111),
+        REVAutoMint[] memory mintConfs = new REVAutoMint[](1);
+        mintConfs[0] = REVAutoMint({
+            chainId: uint32(premintChainId),
             count: uint104(37_000_000 * decimalMultiplier),
             beneficiary: OPERATOR
         });
@@ -151,13 +154,14 @@ contract DeployScript is Script, Sphinx {
         // The project's revnet stage configurations.
         REVStageConfig[] memory stageConfigurations = new REVStageConfig[](1);
         stageConfigurations[0] = REVStageConfig({
-            mintConfigs: mintConfs,
+            autoMints: mintConfs,
             startsAtOrAfter: uint40(block.timestamp + TIME_UNTIL_START),
-            splitPercent: uint16(JBConstants.MAX_RESERVED_RATE / 5), // 20%
-            initialPrice: uint104(10 ** (decimals - 2)),
-            priceIncreaseFrequency: 7 days,
-            priceIncreasePercentage: uint32(JBConstants.MAX_DECAY_RATE / 100), // 1%
-            cashOutTaxIntensity: uint16(JBConstants.MAX_REDEMPTION_RATE / 3) // 0.3
+            splitPercent: uint16(JBConstants.MAX_RESERVED_PERCENT / 2), // 50%
+            initialIssuance: uint112(1000 * decimalMultiplier),
+            issuanceDecayFrequency: 180 days,
+            issuanceDecayPercent: 300_000_000, // 30%
+            cashOutTaxRate: 3000, // 0.3
+            extraMetadata: 0
         });
 
         // The project's revnet configuration
@@ -165,7 +169,10 @@ contract DeployScript is Script, Sphinx {
             description: REVDescription(name, symbol, projectUri, ERC20_SALT),
             baseCurrency: uint32(uint160(JBConstants.NATIVE_TOKEN)),
             splitOperator: OPERATOR,
-            stageConfigurations: stageConfigurations
+            stageConfigurations: stageConfigurations,
+            loanSources: new REVLoanSource[](0),
+            loans: address(0),
+            allowCrosschainSuckerExtension: true
         });
 
         // The project's buyback hook configuration.
@@ -228,12 +235,15 @@ contract DeployScript is Script, Sphinx {
     }
 
     function deploy() public sphinx {
-        // Approve the basic deployer to configure the project and transfer it.
-        core.projects.approve(address(revnet.basic_deployer), 1);
+
+        uint256 FEE_PROJECT_ID = 1;
+
+        // Approve the basic deployer to configure the project.
+        core.projects.approve(address(revnet.basic_deployer), FEE_PROJECT_ID);
 
         // Deploy the NANA fee project.
         revnet.basic_deployer.deployFor({
-            revnetId: 1,
+            revnetId: FEE_PROJECT_ID,
             configuration: feeProjectConfig.configuration,
             terminalConfigurations: feeProjectConfig.terminalConfigurations,
             buybackHookConfiguration: feeProjectConfig.buybackHookConfiguration,
