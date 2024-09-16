@@ -59,7 +59,7 @@ contract DeployScript is Script, Sphinx {
     FeeProjectConfig feeProjectConfig;
     bytes32 SUCKER_SALT = "NANA_SUCKER";
     bytes32 ERC20_SALT = "NANA_TOKEN";
-    address OPERATOR = 0x961d4191965C49537c88F764D88318872CE405bE;
+    address OPERATOR = 0x823b92d6a4b2AED4b15675c7917c9f922ea8ADAD;
     address TRUSTED_FORWARDER = 0xB2b5841DBeF766d4b521221732F9B618fCf34A87;
     uint256 TIME_UNTIL_START = 1 days;
 
@@ -159,7 +159,7 @@ contract DeployScript is Script, Sphinx {
             splitPercent: uint16(JBConstants.MAX_RESERVED_PERCENT / 2), // 50%
             initialIssuance: uint112(1000 * decimalMultiplier),
             issuanceDecayFrequency: 180 days,
-            issuanceDecayPercent: 300_000_000, // 30%
+            issuanceDecayPercent: 380_000_000, // 38%
             cashOutTaxRate: 3000, // 0.3
             extraMetadata: 0
         });
