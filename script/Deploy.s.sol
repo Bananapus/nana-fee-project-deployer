@@ -8,29 +8,20 @@ import "@rev-net/core/script/helpers/RevnetCoreDeploymentLib.sol";
 import "@bananapus/buyback-hook/script/helpers/BuybackDeploymentLib.sol";
 import "@bananapus/swap-terminal/script/helpers/SwapTerminalDeploymentLib.sol";
 
-import {JBPermissionIds} from "@bananapus/permission-ids/src/JBPermissionIds.sol";
-import {JBPermissionsData} from "@bananapus/core/src/structs/JBPermissionsData.sol";
 import {JBConstants} from "@bananapus/core/src/libraries/JBConstants.sol";
 import {JBAccountingContext} from "@bananapus/core/src/structs/JBAccountingContext.sol";
 import {JBTerminalConfig} from "@bananapus/core/src/structs/JBTerminalConfig.sol";
-import {REVStageConfig} from "@rev-net/core/src/structs/REVStageConfig.sol";
-import {REVLoanSource} from "@rev-net/core/src/structs/REVLoanSource.sol";
-import {REVAutoMint} from "@rev-net/core/src/structs/REVAutoMint.sol";
-import {REVConfig} from "@rev-net/core/src/structs/REVConfig.sol";
-import {REVBuybackPoolConfig} from "@rev-net/core/src/structs/REVBuybackPoolConfig.sol";
-import {REVBuybackHookConfig} from "@rev-net/core/src/structs/REVBuybackHookConfig.sol";
-import {JB721TierConfig} from "@bananapus/721-hook/src/structs/JB721TierConfig.sol";
-import {JBTokenMapping} from "@bananapus/suckers/src/structs/JBTokenMapping.sol";
 import {JBSuckerDeployerConfig} from "@bananapus/suckers/src/structs/JBSuckerDeployerConfig.sol";
-import {REVSuckerDeploymentConfig} from "@rev-net/core/src/structs/REVSuckerDeploymentConfig.sol";
-import {JBPayHookSpecification} from "@bananapus/core/src/structs/JBPayHookSpecification.sol";
-import {JB721InitTiersConfig} from "@bananapus/721-hook/src/structs/JB721InitTiersConfig.sol";
-import {JB721TiersHookFlags} from "@bananapus/721-hook/src/structs/JB721TiersHookFlags.sol";
+import {JBTokenMapping} from "@bananapus/suckers/src/structs/JBTokenMapping.sol";
+import {REVAutoMint} from "@rev-net/core/src/structs/REVAutoMint.sol";
+import {REVBuybackHookConfig} from "@rev-net/core/src/structs/REVBuybackHookConfig.sol";
+import {REVBuybackPoolConfig} from "@rev-net/core/src/structs/REVBuybackPoolConfig.sol";
+import {REVConfig} from "@rev-net/core/src/structs/REVConfig.sol";
+import {REVCroptopAllowedPost} from "@rev-net/core/src/structs/REVCroptopAllowedPost.sol";
 import {REVDescription} from "@rev-net/core/src/structs/REVDescription.sol";
-import {IJBPrices} from "@bananapus/core/src/interfaces/IJBPrices.sol";
-import {REVDeploy721TiersHookConfig} from "@rev-net/core/src/structs/REVDeploy721TiersHookConfig.sol";
-import {JBDeploy721TiersHookConfig} from "@bananapus/721-hook/src/structs/JBDeploy721TiersHookConfig.sol";
-import {IJB721TokenUriResolver} from "@bananapus/721-hook/src/interfaces/IJB721TokenUriResolver.sol";
+import {REVLoanSource} from "@rev-net/core/src/structs/REVLoanSource.sol";
+import {REVStageConfig} from "@rev-net/core/src/structs/REVStageConfig.sol";
+import {REVSuckerDeploymentConfig} from "@rev-net/core/src/structs/REVSuckerDeploymentConfig.sol";
 
 import {Sphinx} from "@sphinx-labs/contracts/SphinxPlugin.sol";
 import {Script} from "forge-std/Script.sol";
@@ -43,22 +34,24 @@ struct FeeProjectConfig {
 }
 
 contract DeployScript is Script, Sphinx {
-    /// @notice tracks the deployment of the core contracts for the chain we are deploying to.
-    CoreDeployment core;
-    /// @notice tracks the deployment of the sucker contracts for the chain we are deploying to.
-    SuckerDeployment suckers;
-    /// @notice tracks the deployment of the revnet contracts for the chain we are deploying to.
-    RevnetCoreDeployment revnet;
-    /// @notice tracks the deployment of the 721 hook contracts for the chain we are deploying to.
-    Hook721Deployment hook;
     /// @notice tracks the deployment of the buyback hook.
     BuybackDeployment buybackHook;
+    /// @notice tracks the deployment of the core contracts for the chain we are deploying to.
+    CoreDeployment core;
+    /// @notice tracks the deployment of the 721 hook contracts for the chain we are deploying to.
+    Hook721Deployment hook;
+    /// @notice tracks the deployment of the revnet contracts for the chain we are deploying to.
+    RevnetCoreDeployment revnet;
+    /// @notice tracks the deployment of the sucker contracts for the chain we are deploying to.
+    SuckerDeployment suckers;
     /// @notice tracks the deployment of the swap terminal.
     SwapTerminalDeployment swapTerminal;
 
     FeeProjectConfig feeProjectConfig;
-    bytes32 SUCKER_SALT = "NANA_SUCKER";
-    bytes32 ERC20_SALT = "NANA_TOKEN";
+
+    bytes32 ERC20_SALT = "_NANA_ERC20_SALT_";
+    bytes32 SUCKER_SALT = "_NANA_SUCKER_SALT_";
+
     address OPERATOR = 0x823b92d6a4b2AED4b15675c7917c9f922ea8ADAD;
     address TRUSTED_FORWARDER = 0xB2b5841DBeF766d4b521221732F9B618fCf34A87;
     uint256 TIME_UNTIL_START = 1 days;
@@ -105,12 +98,12 @@ contract DeployScript is Script, Sphinx {
         // Because of the cross-chain allowing components of nana-core, all chains require the same start_time,
         // for this reason we can't rely on the simulations block.time and we need a shared timestamp across all
         // simulations.
-        uint256 _realTimestamp = vm.envUint("START_TIME");
-        if (_realTimestamp <= block.timestamp - 1 days) {
+        uint256 realTimestamp = vm.envUint("START_TIME");
+        if (realTimestamp <= block.timestamp - TIME_UNTIL_START) {
             revert("Something went wrong while setting the 'START_TIME' environment variable.");
         }
 
-        vm.warp(_realTimestamp);
+        vm.warp(realTimestamp);
 
         // Perform the deployment transactions.
         deploy();
@@ -154,7 +147,7 @@ contract DeployScript is Script, Sphinx {
         // The project's revnet stage configurations.
         REVStageConfig[] memory stageConfigurations = new REVStageConfig[](1);
         stageConfigurations[0] = REVStageConfig({
-            autoMints: REVAutoMint,
+            autoMints: mintConfs,
             startsAtOrAfter: uint40(block.timestamp + TIME_UNTIL_START),
             splitPercent: 38, // 38%
             initialIssuance: uint112(1000 * decimalMultiplier),
