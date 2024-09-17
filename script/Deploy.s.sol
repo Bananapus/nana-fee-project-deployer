@@ -154,13 +154,13 @@ contract DeployScript is Script, Sphinx {
         // The project's revnet stage configurations.
         REVStageConfig[] memory stageConfigurations = new REVStageConfig[](1);
         stageConfigurations[0] = REVStageConfig({
-            autoMints: mintConfs,
+            autoMints: REVAutoMint,
             startsAtOrAfter: uint40(block.timestamp + TIME_UNTIL_START),
-            splitPercent: uint16(JBConstants.MAX_RESERVED_PERCENT / 2), // 50%
+            splitPercent: 38, // 38%
             initialIssuance: uint112(1000 * decimalMultiplier),
-            issuanceDecayFrequency: 180 days,
+            issuanceDecayFrequency: 360 days,
             issuanceDecayPercent: 380_000_000, // 38%
-            cashOutTaxRate: 3000, // 0.3
+            cashOutTaxRate: 1000, // 0.1
             extraMetadata: 0
         });
 
