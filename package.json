@@ -1,6 +1,6 @@
 {
     "name": "@bananapus/fee-project-deployer",
-    "version": "0.0.4",
+    "version": "0.0.6",
     "license": "MIT",
     "repository": {
         "type": "git",
@@ -15,12 +15,12 @@
         "artifacts": "source ./.env && npx sphinx artifacts --org-id 'my-org-id' --project-name 'nana-fee-project'"
     },
     "dependencies": {
-        "@bananapus/buyback-hook": "^0.0.16",
-        "@bananapus/core": "^0.0.30",
-        "@bananapus/ownable": "^0.0.6",
-        "@bananapus/suckers": "^0.0.19",
-        "@bananapus/swap-terminal": "^0.0.16",
-        "@rev-net/core": "^0.0.33",
+        "@bananapus/buyback-hook": "^0.0.20",
+        "@bananapus/core": "^0.0.32",
+        "@bananapus/ownable": "^0.0.7",
+        "@bananapus/suckers": "^0.0.23",
+        "@bananapus/swap-terminal": "^0.0.21",
+        "@rev-net/core": "^0.0.35",
         "@openzeppelin/contracts": "^5.0.2"
     },
     "devDependencies": {
