@@ -49,8 +49,15 @@ contract DeployScript is Script, Sphinx {
 
     FeeProjectConfig feeProjectConfig;
 
+    uint256 PREMINT_CHAIN_ID = 11_155_111;
     bytes32 ERC20_SALT = "_NANA_ERC20_SALT_";
     bytes32 SUCKER_SALT = "_NANA_SUCKER_SALT_";
+    string NAME = "Bananapus";
+    string SYMBOL = "$NANA";
+    string PROJECT_URI = "ipfs://QmareAjTrXVLNyUhipU2iYpWCHYqzeHYvZ1TaK9HtswvcW";
+    uint32 NATIVE_CURRENCY = uint32(uint160(JBConstants.NATIVE_TOKEN));
+    uint8 DECIMALS = 18;
+    uint256 DECIMAL_MULTIPLIER = 10 ** DECIMALS;
 
     address OPERATOR = 0x823b92d6a4b2AED4b15675c7917c9f922ea8ADAD;
     address TRUSTED_FORWARDER = 0xB2b5841DBeF766d4b521221732F9B618fCf34A87;
@@ -110,14 +117,6 @@ contract DeployScript is Script, Sphinx {
     }
 
     function getNANARevnetConfig() internal view returns (FeeProjectConfig memory) {
-        // Define constants
-        string memory name = "Bananapus";
-        string memory symbol = "$NANA";
-        string memory projectUri = "ipfs://QmareAjTrXVLNyUhipU2iYpWCHYqzeHYvZ1TaK9HtswvcW";
-        uint8 decimals = 18;
-        uint256 decimalMultiplier = 10 ** decimals;
-        uint256 premintChainId = 11_155_111;
-
         // The tokens that the project accepts and stores.
         JBAccountingContext[] memory accountingContextsToAccept = new JBAccountingContext[](1);
 
@@ -125,7 +124,7 @@ contract DeployScript is Script, Sphinx {
         accountingContextsToAccept[0] = JBAccountingContext({
             token: JBConstants.NATIVE_TOKEN,
             decimals: 18,
-            currency: uint32(uint160(JBConstants.NATIVE_TOKEN))
+            currency: NATIVE_CURRENCY 
         });
 
         // The terminals that the project will accept funds through.
@@ -139,8 +138,8 @@ contract DeployScript is Script, Sphinx {
 
         REVAutoMint[] memory mintConfs = new REVAutoMint[](1);
         mintConfs[0] = REVAutoMint({
-            chainId: uint32(premintChainId),
-            count: uint104(37_000_000 * decimalMultiplier),
+            chainId: uint32(PREMINT_CHAIN_ID),
+            count: uint104(37_000_000 * DECIMAL_MULTIPLIER),
             beneficiary: OPERATOR
         });
 
@@ -150,7 +149,7 @@ contract DeployScript is Script, Sphinx {
             autoMints: mintConfs,
             startsAtOrAfter: uint40(block.timestamp + TIME_UNTIL_START),
             splitPercent: 38, // 38%
-            initialIssuance: uint112(1000 * decimalMultiplier),
+            initialIssuance: uint112(1000 * DECIMAL_MULTIPLIER),
             issuanceDecayFrequency: 360 days,
             issuanceDecayPercent: 380_000_000, // 38%
             cashOutTaxRate: 1000, // 0.1
@@ -159,8 +158,8 @@ contract DeployScript is Script, Sphinx {
 
         // The project's revnet configuration
         REVConfig memory revnetConfiguration = REVConfig({
-            description: REVDescription(name, symbol, projectUri, ERC20_SALT),
-            baseCurrency: uint32(uint160(JBConstants.NATIVE_TOKEN)),
+            description: REVDescription(NAME, SYMBOL, PROJECT_URI, ERC20_SALT),
+            baseCurrency: NATIVE_CURRENCY,
             splitOperator: OPERATOR,
             stageConfigurations: stageConfigurations,
             loanSources: new REVLoanSource[](0),
