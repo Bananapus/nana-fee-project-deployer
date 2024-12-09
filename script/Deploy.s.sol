@@ -13,7 +13,7 @@ import {JBAccountingContext} from "@bananapus/core/src/structs/JBAccountingConte
 import {JBTerminalConfig} from "@bananapus/core/src/structs/JBTerminalConfig.sol";
 import {JBSuckerDeployerConfig} from "@bananapus/suckers/src/structs/JBSuckerDeployerConfig.sol";
 import {JBTokenMapping} from "@bananapus/suckers/src/structs/JBTokenMapping.sol";
-import {REVAutoMint} from "@rev-net/core/src/structs/REVAutoMint.sol";
+import {REVAutoIssuance} from "@rev-net/core/src/structs/REVAutoIssuance.sol";
 import {REVBuybackHookConfig} from "@rev-net/core/src/structs/REVBuybackHookConfig.sol";
 import {REVBuybackPoolConfig} from "@rev-net/core/src/structs/REVBuybackPoolConfig.sol";
 import {REVConfig} from "@rev-net/core/src/structs/REVConfig.sol";
@@ -134,8 +134,8 @@ contract DeployScript is Script, Sphinx {
             accountingContextsToAccept: new JBAccountingContext[](0)
         });
 
-        REVAutoMint[] memory mintConfs = new REVAutoMint[](1);
-        mintConfs[0] = REVAutoMint({
+        REVAutoIssuance[] memory mintConfs = new REVAutoIssuance[](1);
+        mintConfs[0] = REVAutoIssuance({
             chainId: uint32(PREMINT_CHAIN_ID),
             count: uint104(37_000_000 * DECIMAL_MULTIPLIER),
             beneficiary: OPERATOR
@@ -144,12 +144,12 @@ contract DeployScript is Script, Sphinx {
         // The project's revnet stage configurations.
         REVStageConfig[] memory stageConfigurations = new REVStageConfig[](1);
         stageConfigurations[0] = REVStageConfig({
-            autoMints: mintConfs,
+            autoIssuances: mintConfs,
             startsAtOrAfter: uint40(block.timestamp + TIME_UNTIL_START),
             splitPercent: 38, // 38%
             initialIssuance: uint112(1000 * DECIMAL_MULTIPLIER),
-            issuanceDecayFrequency: 360 days,
-            issuanceDecayPercent: 380_000_000, // 38%
+            issuanceCutFrequency: 360 days,
+            issuanceCutPercent: 380_000_000, // 38%
             cashOutTaxRate: 1000, // 0.1
             extraMetadata: 0
         });
@@ -166,8 +166,7 @@ contract DeployScript is Script, Sphinx {
                 splitOperator: OPERATOR,
                 stageConfigurations: stageConfigurations,
                 loanSources: new REVLoanSource[](0),
-                loans: address(revnet.loans),
-                allowCrosschainSuckerExtension: true
+                loans: address(revnet.loans)
             });
         }
 
@@ -193,7 +192,7 @@ contract DeployScript is Script, Sphinx {
 
         JBSuckerDeployerConfig[] memory suckerDeployerConfigurations;
         if (block.chainid == 1 || block.chainid == 11_155_111) {
-            suckerDeployerConfigurations = new JBSuckerDeployerConfig[](2);
+            suckerDeployerConfigurations = new JBSuckerDeployerConfig[](3);
             // OP
             suckerDeployerConfigurations[0] =
                 JBSuckerDeployerConfig({deployer: suckers.optimismDeployer, mappings: tokenMappings});
@@ -201,8 +200,8 @@ contract DeployScript is Script, Sphinx {
             suckerDeployerConfigurations[1] =
                 JBSuckerDeployerConfig({deployer: suckers.baseDeployer, mappings: tokenMappings});
 
-            // suckerDeployerConfigurations[2] =
-            //     JBSuckerDeployerConfig({deployer: suckers.arbitrumDeployer, mappings: tokenMappings});
+            suckerDeployerConfigurations[2] =
+                JBSuckerDeployerConfig({deployer: suckers.arbitrumDeployer, mappings: tokenMappings});
         } else {
             suckerDeployerConfigurations = new JBSuckerDeployerConfig[](1);
             // L2 -> Mainnet
