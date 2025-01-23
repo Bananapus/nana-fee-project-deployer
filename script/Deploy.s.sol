@@ -53,14 +53,15 @@ contract DeployScript is Script, Sphinx {
     uint256 PREMINT_CHAIN_ID = 11_155_111;
     bytes32 ERC20_SALT = "_NANA_ERC20_SALT_";
     bytes32 SUCKER_SALT = "_NANA_SUCKER_SALT_";
-    string NAME = "Bananapus";
+    string NAME = "Bananapus (Juicebox V4)";
     string SYMBOL = "NANA";
-    string PROJECT_URI = "ipfs://QmareAjTrXVLNyUhipU2iYpWCHYqzeHYvZ1TaK9HtswvcW";
+    string PROJECT_URI = "ipfs://QmQgSDkLk9ezBgSY97w9etouf17JPBXjVdc4MryFVErFwN";
     uint32 NATIVE_CURRENCY = uint32(uint160(JBConstants.NATIVE_TOKEN));
+    uint32 ETH_CURRENCY = 1; // JBCurrencyIds.ETH.
     uint8 DECIMALS = 18;
     uint256 DECIMAL_MULTIPLIER = 10 ** DECIMALS;
 
-    address OPERATOR = 0x823b92d6a4b2AED4b15675c7917c9f922ea8ADAD;
+    address OPERATOR = 0x961d4191965C49537c88F764D88318872CE405bE;
     address TRUSTED_FORWARDER = 0xB2b5841DBeF766d4b521221732F9B618fCf34A87;
     uint256 TIME_UNTIL_START = 1 days;
 
@@ -134,19 +135,12 @@ contract DeployScript is Script, Sphinx {
             accountingContextsToAccept: new JBAccountingContext[](0)
         });
 
-        REVAutoIssuance[] memory mintConfs = new REVAutoIssuance[](1);
-        mintConfs[0] = REVAutoIssuance({
-            chainId: uint32(PREMINT_CHAIN_ID),
-            count: uint104(37_000_000 * DECIMAL_MULTIPLIER),
-            beneficiary: OPERATOR
-        });
-
         // The project's revnet stage configurations.
         REVStageConfig[] memory stageConfigurations = new REVStageConfig[](1);
         stageConfigurations[0] = REVStageConfig({
-            autoIssuances: mintConfs,
+            autoIssuances: new REVAutoIssuance[](0),
             startsAtOrAfter: uint40(block.timestamp + TIME_UNTIL_START),
-            splitPercent: 38, // 38%
+            splitPercent: 6200, // 62%
             initialIssuance: uint112(1000 * DECIMAL_MULTIPLIER),
             issuanceCutFrequency: 360 days,
             issuanceCutPercent: 380_000_000, // 38%
@@ -162,7 +156,7 @@ contract DeployScript is Script, Sphinx {
             // The project's revnet configuration
             revnetConfiguration = REVConfig({
                 description: REVDescription(NAME, SYMBOL, PROJECT_URI, ERC20_SALT),
-                baseCurrency: NATIVE_CURRENCY,
+                baseCurrency: ETH_CURRENCY,
                 splitOperator: OPERATOR,
                 stageConfigurations: stageConfigurations,
                 loanSources: new REVLoanSource[](0),
