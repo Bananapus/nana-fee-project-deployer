@@ -23,6 +23,8 @@ import {REVLoanSource} from "@rev-net/core/src/structs/REVLoanSource.sol";
 import {REVStageConfig} from "@rev-net/core/src/structs/REVStageConfig.sol";
 import {REVSuckerDeploymentConfig} from "@rev-net/core/src/structs/REVSuckerDeploymentConfig.sol";
 import {IJBTerminal} from "@bananapus/core/src/interfaces/IJBTerminal.sol";
+import {JBSplit} from "@bananapus/core/src/structs/JBSplit.sol";
+import {IJBSplitHook} from "@bananapus/core/src/interfaces/IJBSplitHook.sol";
 
 import {Sphinx} from "@sphinx-labs/contracts/SphinxPlugin.sol";
 import {Script} from "forge-std/Script.sol";
@@ -61,7 +63,7 @@ contract DeployScript is Script, Sphinx {
     uint8 DECIMALS = 18;
     uint256 DECIMAL_MULTIPLIER = 10 ** DECIMALS;
 
-    address OPERATOR = 0x961d4191965C49537c88F764D88318872CE405bE;
+    address OPERATOR;
     address TRUSTED_FORWARDER = 0xB2b5841DBeF766d4b521221732F9B618fCf34A87;
     uint256 TIME_UNTIL_START = 1 days;
 
@@ -99,6 +101,9 @@ contract DeployScript is Script, Sphinx {
             vm.envOr("NANA_SWAP_TERMINAL_DEPLOYMENT_PATH", string("node_modules/@bananapus/swap-terminal/deployments/"))
         );
 
+        // Set the operator address to be the multisig.
+        OPERATOR = safeAddress();
+
         feeProjectConfig = getNANARevnetConfig();
 
         // Since Juicebox has logic dependent on the timestamp we warp time to create a scenario closer to production.
@@ -135,12 +140,23 @@ contract DeployScript is Script, Sphinx {
             accountingContextsToAccept: new JBAccountingContext[](0)
         });
 
+        JBSplit[] memory splits = new JBSplit[](1);
+        splits[0] = JBSplit({
+            percent: JBConstants.SPLITS_TOTAL_PERCENT,
+            projectId: 0,
+            beneficiary: payable(OPERATOR),
+            preferAddToBalance: false,
+            lockedUntil: 0,
+            hook: IJBSplitHook(address(0))
+        });
+
         // The project's revnet stage configurations.
         REVStageConfig[] memory stageConfigurations = new REVStageConfig[](1);
         stageConfigurations[0] = REVStageConfig({
             autoIssuances: new REVAutoIssuance[](0),
             startsAtOrAfter: uint40(block.timestamp + TIME_UNTIL_START),
             splitPercent: 6200, // 62%
+            splits: splits,
             initialIssuance: uint112(1000 * DECIMAL_MULTIPLIER),
             issuanceCutFrequency: 360 days,
             issuanceCutPercent: 380_000_000, // 38%

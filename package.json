@@ -1,6 +1,6 @@
 {
     "name": "@bananapus/fee-project-deployer",
-    "version": "0.0.6",
+    "version": "0.0.7",
     "license": "MIT",
     "repository": {
         "type": "git",
@@ -12,19 +12,19 @@
     "scripts": {
         "deploy:mainnets": "source ./.env && export START_TIME=$(date +%s) && npx sphinx propose ./script/Deploy.s.sol --networks mainnets",
         "deploy:testnets": "source ./.env && export START_TIME=$(date +%s) && npx sphinx propose ./script/Deploy.s.sol --networks testnets",
-        "artifacts": "source ./.env && npx sphinx artifacts --org-id 'my-org-id' --project-name 'nana-fee-project'"
+        "artifacts": "source ./.env && npx sphinx artifacts --org-id 'ea165b21-7cdc-4d7b-be59-ecdd4c26bee4' --project-name 'nana-fee-project'"
     },
     "dependencies": {
-        "@bananapus/buyback-hook": "^0.0.22",
-        "@bananapus/core": "^0.0.38",
-        "@bananapus/ownable": "^0.0.7",
-        "@bananapus/suckers": "^0.0.27",
-        "@bananapus/swap-terminal": "^0.0.22",
-        "@rev-net/core": "^0.0.39",
-        "@openzeppelin/contracts": "^5.1.0",
-        "@bananapus/permission-ids": "^0.0.16"
+        "@bananapus/buyback-hook": "^0.0.24",
+        "@bananapus/core": "^0.0.39",
+        "@bananapus/ownable": "^0.0.8",
+        "@bananapus/suckers": "^0.0.29",
+        "@bananapus/swap-terminal": "^0.0.23",
+        "@rev-net/core": "^0.0.42",
+        "@openzeppelin/contracts": "^5.2.0",
+        "@bananapus/permission-ids": "^0.0.17"
     },
     "devDependencies": {
-        "@sphinx-labs/plugins": "^0.33.0"
+        "@sphinx-labs/plugins": "^0.33.1"
     }
 }
