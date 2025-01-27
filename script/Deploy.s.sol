@@ -13,7 +13,7 @@ import {JBAccountingContext} from "@bananapus/core/src/structs/JBAccountingConte
 import {JBTerminalConfig} from "@bananapus/core/src/structs/JBTerminalConfig.sol";
 import {JBSuckerDeployerConfig} from "@bananapus/suckers/src/structs/JBSuckerDeployerConfig.sol";
 import {JBTokenMapping} from "@bananapus/suckers/src/structs/JBTokenMapping.sol";
-import {REVAutoMint} from "@rev-net/core/src/structs/REVAutoMint.sol";
+import {REVAutoIssuance} from "@rev-net/core/src/structs/REVAutoIssuance.sol";
 import {REVBuybackHookConfig} from "@rev-net/core/src/structs/REVBuybackHookConfig.sol";
 import {REVBuybackPoolConfig} from "@rev-net/core/src/structs/REVBuybackPoolConfig.sol";
 import {REVConfig} from "@rev-net/core/src/structs/REVConfig.sol";
@@ -53,14 +53,15 @@ contract DeployScript is Script, Sphinx {
     uint256 PREMINT_CHAIN_ID = 11_155_111;
     bytes32 ERC20_SALT = "_NANA_ERC20_SALT_";
     bytes32 SUCKER_SALT = "_NANA_SUCKER_SALT_";
-    string NAME = "Bananapus";
+    string NAME = "Bananapus (Juicebox V4)";
     string SYMBOL = "NANA";
-    string PROJECT_URI = "ipfs://QmareAjTrXVLNyUhipU2iYpWCHYqzeHYvZ1TaK9HtswvcW";
+    string PROJECT_URI = "ipfs://QmQgSDkLk9ezBgSY97w9etouf17JPBXjVdc4MryFVErFwN";
     uint32 NATIVE_CURRENCY = uint32(uint160(JBConstants.NATIVE_TOKEN));
+    uint32 ETH_CURRENCY = 1; // JBCurrencyIds.ETH.
     uint8 DECIMALS = 18;
     uint256 DECIMAL_MULTIPLIER = 10 ** DECIMALS;
 
-    address OPERATOR = 0x823b92d6a4b2AED4b15675c7917c9f922ea8ADAD;
+    address OPERATOR = 0x961d4191965C49537c88F764D88318872CE405bE;
     address TRUSTED_FORWARDER = 0xB2b5841DBeF766d4b521221732F9B618fCf34A87;
     uint256 TIME_UNTIL_START = 1 days;
 
@@ -134,22 +135,15 @@ contract DeployScript is Script, Sphinx {
             accountingContextsToAccept: new JBAccountingContext[](0)
         });
 
-        REVAutoMint[] memory mintConfs = new REVAutoMint[](1);
-        mintConfs[0] = REVAutoMint({
-            chainId: uint32(PREMINT_CHAIN_ID),
-            count: uint104(37_000_000 * DECIMAL_MULTIPLIER),
-            beneficiary: OPERATOR
-        });
-
         // The project's revnet stage configurations.
         REVStageConfig[] memory stageConfigurations = new REVStageConfig[](1);
         stageConfigurations[0] = REVStageConfig({
-            autoMints: mintConfs,
+            autoIssuances: new REVAutoIssuance[](0),
             startsAtOrAfter: uint40(block.timestamp + TIME_UNTIL_START),
-            splitPercent: 38, // 38%
+            splitPercent: 6200, // 62%
             initialIssuance: uint112(1000 * DECIMAL_MULTIPLIER),
-            issuanceDecayFrequency: 360 days,
-            issuanceDecayPercent: 380_000_000, // 38%
+            issuanceCutFrequency: 360 days,
+            issuanceCutPercent: 380_000_000, // 38%
             cashOutTaxRate: 1000, // 0.1
             extraMetadata: 0
         });
@@ -162,12 +156,11 @@ contract DeployScript is Script, Sphinx {
             // The project's revnet configuration
             revnetConfiguration = REVConfig({
                 description: REVDescription(NAME, SYMBOL, PROJECT_URI, ERC20_SALT),
-                baseCurrency: NATIVE_CURRENCY,
+                baseCurrency: ETH_CURRENCY,
                 splitOperator: OPERATOR,
                 stageConfigurations: stageConfigurations,
                 loanSources: new REVLoanSource[](0),
-                loans: address(revnet.loans),
-                allowCrosschainSuckerExtension: true
+                loans: address(revnet.loans)
             });
         }
 
@@ -193,7 +186,7 @@ contract DeployScript is Script, Sphinx {
 
         JBSuckerDeployerConfig[] memory suckerDeployerConfigurations;
         if (block.chainid == 1 || block.chainid == 11_155_111) {
-            suckerDeployerConfigurations = new JBSuckerDeployerConfig[](2);
+            suckerDeployerConfigurations = new JBSuckerDeployerConfig[](3);
             // OP
             suckerDeployerConfigurations[0] =
                 JBSuckerDeployerConfig({deployer: suckers.optimismDeployer, mappings: tokenMappings});
@@ -201,8 +194,8 @@ contract DeployScript is Script, Sphinx {
             suckerDeployerConfigurations[1] =
                 JBSuckerDeployerConfig({deployer: suckers.baseDeployer, mappings: tokenMappings});
 
-            // suckerDeployerConfigurations[2] =
-            //     JBSuckerDeployerConfig({deployer: suckers.arbitrumDeployer, mappings: tokenMappings});
+            suckerDeployerConfigurations[2] =
+                JBSuckerDeployerConfig({deployer: suckers.arbitrumDeployer, mappings: tokenMappings});
         } else {
             suckerDeployerConfigurations = new JBSuckerDeployerConfig[](1);
             // L2 -> Mainnet
