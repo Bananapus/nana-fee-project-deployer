@@ -161,7 +161,7 @@ contract DeployScript is Script, Sphinx {
             issuanceCutFrequency: 360 days,
             issuanceCutPercent: 380_000_000, // 38%
             cashOutTaxRate: 1000, // 0.1
-            extraMetadata: 0
+            extraMetadata: 4 // Allow adding suckers.
         });
 
         REVConfig memory revnetConfiguration;
