@@ -64,8 +64,8 @@ contract DeployScript is Script, Sphinx {
     uint256 DECIMAL_MULTIPLIER = 10 ** DECIMALS;
 
     address OPERATOR;
-    address TRUSTED_FORWARDER = 0xB2b5841DBeF766d4b521221732F9B618fCf34A87;
-    uint256 TIME_UNTIL_START = 1 days;
+    address TRUSTED_FORWARDER;
+    uint256 TIME_UNTIL_START = 3 hours;
 
     function configureSphinx() public override {
         // TODO: Update to contain revnet devs.
@@ -103,6 +103,7 @@ contract DeployScript is Script, Sphinx {
 
         // Set the operator address to be the multisig.
         OPERATOR = safeAddress();
+        TRUSTED_FORWARDER = core.controller.trustedForwarder();
 
         feeProjectConfig = getNANARevnetConfig();
 
