@@ -158,7 +158,7 @@ contract DeployScript is Script, Sphinx {
             startsAtOrAfter: uint40(block.timestamp + TIME_UNTIL_START),
             splitPercent: 6200, // 62%
             splits: splits,
-            initialIssuance: uint112(1000 * DECIMAL_MULTIPLIER),
+            initialIssuance: uint112(10_000 * DECIMAL_MULTIPLIER),
             issuanceCutFrequency: 360 days,
             issuanceCutPercent: 380_000_000, // 38%
             cashOutTaxRate: 1000, // 0.1
