@@ -52,7 +52,6 @@ contract DeployScript is Script, Sphinx {
 
     FeeProjectConfig feeProjectConfig;
 
-    uint256 PREMINT_CHAIN_ID = 11_155_111;
     bytes32 ERC20_SALT = "_NANA_ERC20_SALT_";
     bytes32 SUCKER_SALT = "_NANA_SUCKER_SALT_";
     string NAME = "Bananapus (Juicebox V4)";
@@ -65,7 +64,7 @@ contract DeployScript is Script, Sphinx {
 
     address OPERATOR;
     address TRUSTED_FORWARDER;
-    uint256 TIME_UNTIL_START = 3 hours;
+    uint256 TIME_UNTIL_START = 1 days;
 
     function configureSphinx() public override {
         // TODO: Update to contain revnet devs.
@@ -154,11 +153,11 @@ contract DeployScript is Script, Sphinx {
         // The project's revnet stage configurations.
         REVStageConfig[] memory stageConfigurations = new REVStageConfig[](1);
         stageConfigurations[0] = REVStageConfig({
-            autoIssuances: new REVAutoIssuance[](0),
             startsAtOrAfter: uint40(block.timestamp + TIME_UNTIL_START),
+            autoIssuances: new REVAutoIssuance[](0),
             splitPercent: 6200, // 62%
             splits: splits,
-            initialIssuance: uint112(1000 * DECIMAL_MULTIPLIER),
+            initialIssuance: uint112(10_000 * DECIMAL_MULTIPLIER),
             issuanceCutFrequency: 360 days,
             issuanceCutPercent: 380_000_000, // 38%
             cashOutTaxRate: 1000, // 0.1
