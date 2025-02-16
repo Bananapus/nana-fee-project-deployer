@@ -52,7 +52,6 @@ contract DeployScript is Script, Sphinx {
 
     FeeProjectConfig feeProjectConfig;
 
-    uint256 PREMINT_CHAIN_ID = 11_155_111;
     bytes32 ERC20_SALT = "_NANA_ERC20_SALT_";
     bytes32 SUCKER_SALT = "_NANA_SUCKER_SALT_";
     string NAME = "Bananapus (Juicebox V4)";
