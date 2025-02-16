@@ -154,8 +154,8 @@ contract DeployScript is Script, Sphinx {
         // The project's revnet stage configurations.
         REVStageConfig[] memory stageConfigurations = new REVStageConfig[](1);
         stageConfigurations[0] = REVStageConfig({
-            autoIssuances: new REVAutoIssuance[](0),
             startsAtOrAfter: uint40(block.timestamp + TIME_UNTIL_START),
+            autoIssuances: new REVAutoIssuance[](0),
             splitPercent: 6200, // 62%
             splits: splits,
             initialIssuance: uint112(10_000 * DECIMAL_MULTIPLIER),
