@@ -64,11 +64,11 @@ contract DeployScript is Script, Sphinx {
 
     address OPERATOR;
     address TRUSTED_FORWARDER;
-    uint256 TIME_UNTIL_START = 1 days;
+    uint256 TIME_UNTIL_START = 3 days;
 
     function configureSphinx() public override {
         // TODO: Update to contain revnet devs.
-        sphinxConfig.projectName = "nana-fee-project";
+        sphinxConfig.projectName = "nana-fee-project-testnet";
         sphinxConfig.mainnets = ["ethereum", "optimism", "base", "arbitrum"];
         sphinxConfig.testnets = ["ethereum_sepolia", "optimism_sepolia", "base_sepolia", "arbitrum_sepolia"];
     }
@@ -112,7 +112,8 @@ contract DeployScript is Script, Sphinx {
         // Because of the cross-chain allowing components of nana-core, all chains require the same start_time,
         // for this reason we can't rely on the simulations block.time and we need a shared timestamp across all
         // simulations.
-        uint256 realTimestamp = vm.envUint("START_TIME");
+        // uint256 realTimestamp = vm.envUint("START_TIME");
+        uint256 realTimestamp = 1739830244;  // timestamp hardcoded at time of deploy. 
         if (realTimestamp <= block.timestamp - TIME_UNTIL_START) {
             revert("Something went wrong while setting the 'START_TIME' environment variable.");
         }
@@ -175,7 +176,7 @@ contract DeployScript is Script, Sphinx {
                 baseCurrency: ETH_CURRENCY,
                 splitOperator: OPERATOR,
                 stageConfigurations: stageConfigurations,
-                loanSources: new REVLoanSource[](0),
+                loanSources: _loanSources,
                 loans: address(revnet.loans)
             });
         }
