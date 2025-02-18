@@ -64,7 +64,7 @@ contract DeployScript is Script, Sphinx {
 
     address OPERATOR;
     address TRUSTED_FORWARDER;
-    uint256 TIME_UNTIL_START = 1 days;
+    uint256 TIME_UNTIL_START = 3 days;
 
     function configureSphinx() public override {
         // TODO: Update to contain revnet devs.
@@ -104,20 +104,21 @@ contract DeployScript is Script, Sphinx {
         OPERATOR = safeAddress();
         TRUSTED_FORWARDER = core.controller.trustedForwarder();
 
-        feeProjectConfig = getNANARevnetConfig();
-
         // Since Juicebox has logic dependent on the timestamp we warp time to create a scenario closer to production.
         // We force simulations to make the assumption that the `START_TIME` has not occured,
         // and is not the current time.
         // Because of the cross-chain allowing components of nana-core, all chains require the same start_time,
         // for this reason we can't rely on the simulations block.time and we need a shared timestamp across all
         // simulations.
-        uint256 realTimestamp = vm.envUint("START_TIME");
+        // uint256 realTimestamp = vm.envUint("START_TIME");
+        uint256 realTimestamp = 1739830244;  // timestamp hardcoded at time of deploy. 
         if (realTimestamp <= block.timestamp - TIME_UNTIL_START) {
             revert("Something went wrong while setting the 'START_TIME' environment variable.");
         }
 
         vm.warp(realTimestamp);
+
+        feeProjectConfig = getNANARevnetConfig();
 
         // Perform the deployment transactions.
         deploy();
@@ -175,7 +176,7 @@ contract DeployScript is Script, Sphinx {
                 baseCurrency: ETH_CURRENCY,
                 splitOperator: OPERATOR,
                 stageConfigurations: stageConfigurations,
-                loanSources: new REVLoanSource[](0),
+                loanSources: _loanSources,
                 loans: address(revnet.loans)
             });
         }
