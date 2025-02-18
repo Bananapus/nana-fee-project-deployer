@@ -104,8 +104,6 @@ contract DeployScript is Script, Sphinx {
         OPERATOR = safeAddress();
         TRUSTED_FORWARDER = core.controller.trustedForwarder();
 
-        feeProjectConfig = getNANARevnetConfig();
-
         // Since Juicebox has logic dependent on the timestamp we warp time to create a scenario closer to production.
         // We force simulations to make the assumption that the `START_TIME` has not occured,
         // and is not the current time.
@@ -119,6 +117,8 @@ contract DeployScript is Script, Sphinx {
         }
 
         vm.warp(realTimestamp);
+
+        feeProjectConfig = getNANARevnetConfig();
 
         // Perform the deployment transactions.
         deploy();
